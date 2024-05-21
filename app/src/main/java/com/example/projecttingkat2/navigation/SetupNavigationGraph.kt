@@ -1,0 +1,58 @@
+package com.example.projecttingkat2.navigation
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.projecttingkat2.model.Buku
+import com.example.projecttingkat2.ui.screen.BeritaAcaraScreen
+import com.example.projecttingkat2.ui.screen.BookScreen
+import com.example.projecttingkat2.ui.screen.HomeScreen
+import com.example.projecttingkat2.ui.screen.LoginRegisterScreen
+import com.example.projecttingkat2.ui.screen.ProfilScreen
+import com.example.projecttingkat2.ui.screen.detail.DetailGerejaScreen
+import com.example.projecttingkat2.ui.screen.detail.KEY_ID_GEREJA
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun SetupNavigationGraph(navHostController: NavHostController = rememberNavController()) {
+    NavHost(
+        navController = navHostController,
+        startDestination = Screen.LoginRegister.route
+    ) {
+        composable(route = Screen.LoginRegister.route) {
+            LoginRegisterScreen(navHostController)
+        }
+
+        composable(route = Screen.Home.route) {
+            HomeScreen(navHostController)
+        }
+        composable(route = Screen.GerejaFormBaru.route) {
+            DetailGerejaScreen(navHostController)
+        }
+        composable(
+            route = Screen.GerejaFormUbah.route,
+            arguments = listOf(
+                navArgument(KEY_ID_GEREJA) { type = NavType.LongType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getLong(KEY_ID_GEREJA)
+            DetailGerejaScreen(navHostController, id)
+        }
+
+        composable(route = Screen.Book.route) {
+            BookScreen(navHostController)
+        }
+        composable(route = Screen.Profil.route) {
+            ProfilScreen(navHostController)
+        }
+        composable(route = Screen.BeritaAcara.route) {
+            BeritaAcaraScreen(navHostController)
+        }
+    }
+}

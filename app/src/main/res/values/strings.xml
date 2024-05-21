@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Gereja Ku</string>
+
+    <!--    Login Screen-->
+
+    <string name="welcome_back">Selamat Datang di Gereja Ku</string>
+    <string name="login_account">Masuk Menggunakan Akun Anda</string>
+    <string name="email_address">Alamat Surel</string>
+    <string name="nama">Nama</string>
+    <string name="no_hp">Nomor HP</string>
+    <string name="password">Kata Sandi</string>
+    <string name="login">Masuk</string>
+    <string name="forgot_password">Lupa Password</string>
+    <string name="or">Atau</string>
+    <string name="input">Tidak boleh kosong</string>
+    <string name="dont_have_account">Tidak punya akun?</string>
+    <string name="register_here">Daftar di sini</string>
+    <string name="bagikan">Bagikan</string>
+
+    <!--    Register Screen-->
+    <string name="register_account">Daftarkan Akun Anda</string>
+    <string name="name">Nama</string>
+    <string name="daftar">Daftar</string>
+    <string name="have_account">Sudah punya akun?</string>
+    <string name="login_here">Masuk di sini</string>
+
+    <!--    Home Screen-->
+    <string name="kumpulan_buku">Kumpulan Buku Gereja</string>
+    <string name="utama">Utama</string>
+    <string name="about">Tentang Kami</string>
+    <string name="buku">Buku</string>
+    <string name="data_diri">Data Diri</string>
+    <string name="berita_acara">Berita Acara</string>
+
+    <!--    Data gereja-->
+    <string name="gereja1">GBI Stairway</string>
+    <string name="aliran1">Kristen Kharismatik</string>
+    <string name="lokasi1">Mekar Wangi</string>
+    <string name="jadwal1">08.00, 10.30, 13.30, 16.30</string>
+    <string name="deskripsi1">Selamat Beribadah</string>
+    <string name="gereja2">HKBP Bandung</string>
+    <string name="aliran2">Kristen Protestan</string>
+    <string name="lokasi2">Jalan Riau</string>
+    <string name="jadwal2">09.00, 15.00</string>
+    <string name="deskripsi2">Selamat Beribadah</string>
+    <string name="gereja3">GMS</string>
+    <string name="aliran3">Kristen Kharismatik</string>
+    <string name="lokasi3">Mekar Wangi</string>
+    <string name="jadwal3">08.00, 10.30, 13.30, 16.30</string>
+    <string name="deskripsi3">Selamat Beribadah</string>
+
+    <!--    Model BUKU-->
+    <string name="judul1">The Justification of God</string>
+    <string name="judul2">The Legacy of Sovereign Joy</string>
+    <string name="judul3">The Pleasures of God</string>
+    <string name="judul4">The Hidden Smile of God</string>
+    <string name="judul5">The Dangerous Duty of Delight</string>
+    <string name="judul6">Faithful Women and Their Extraordinary God</string>
+    <string name="judul7">Lessons from His Life and Labor</string>
+    <string name="judul8">The Misery of Job and the Mercy of God</string>
+
+    <string name="john_piper">John Piper</string>
+    <string name="noel_piper">Noel Piper</string>
+    <string name="martin_luther">Noel Piper</string>
+
+    <string name="sinopsis1">Pembenaran Allah merupakan eksposisi yang menarik dari Roma 9:1–23. Piper menggabungkan studi eksegetis ketika membahas presentasi teks tentang kedaulatan Tuhan dari sudut pandang Calvinis.
+        \n\nAwalnya diterbitkan pada tahun 1983, penelitian ini disusun sebagai upaya untuk memahami bagaimana Paulus membela kebenaran Allah dalam Roma 9:14–23. Hal ini mencakup upaya luas untuk memahami apa yang Paulus maksudkan dengan kebenaran Allah dan menimbulkan pertanyaan tentang pemilihan dan takdir.</string>
+    <string name="sinopsis2">Kita mengagumi pria-pria ini karena kehebatan mereka, namun kenyataannya Agustinus bergulat dengan nafsu seksual. Martin Luther kesulitan mengendalikan lidahnya. John Calvin berperang dalam peperangan iman dengan senjata duniawi.
+        \n\nNamun setiap orang akan selalu dikenang karena pesan-pesan yang ia nyatakan – pesan-pesan yang masih bergema hingga saat ini. John Piper mengeksplorasi kehidupan masing-masing orang ini, memadukan kegembiraan Agustinus akan Tuhan dengan penekanan Luther pada firman dan penjelasan Calvin tentang Kitab Suci. Melalui kekuatan dan perjuangan mereka kita dapat belajar bagaimana hidup lebih baik saat ini. Ketika kita memikirkan kehidupan mereka, kita melihat kemuliaan dan keagungan Tuhan dan menemukan kekuatan untuk mengatasi kelemahan kita.
+        \n\nJika Anda berpuas diri terhadap dosa, jika Anda kehilangan sukacita Yesus Kristus, jika Anda tumpul karena pengaruh dunia, biarlah kehidupan orang-orang ini membantu Anda mendapatkan kembali keajaiban Allah.</string>
+    <string name="sinopsis3">Anda tidak akan benar-benar mengenal seseorang sampai Anda mengetahui apa yang membuatnya bahagia. Kesenangan kita adalah ukuran karakter kita. Begitu pula dengan Tuhan. Kita hanya bisa mengetahui kehebatan kemuliaan-Nya jika kita mengetahui apa yang membuat Dia senang. Oleh karena itu, kita harus memahami nikmat Allah.
+        \n\nIni bukan buku tentangmu. Ini tentang Dia yang menciptakanmu – Tuhan sendiri. Dalam tur de force teologis ini, Pendeta John Piper menavigasi bukti-bukti alkitabiah untuk membantu kita melihat dan menikmati apa yang ditunjukkan oleh kesenangan Allah kepada kita tentang Dia, sehingga kita bisa menjadi seperti Dia yang kita lihat.
+        \n\nApa yang dibutuhkan gereja dan dunia saat ini, lebih dari apa pun, adalah mengenal dan mencintai – memandang dan memeluk – Allah yang agung, mulia, berdaulat, dan bahagia dalam Alkitab.</string>
+    <string name="sinopsis4">John Bunyan menderita pemenjaraan jangka panjang, meskipun janji sederhana untuk berhenti mengabar akan membebaskannya, dan dia tergerak untuk lebih mengandalkan Tuhan. Meskipun berbulan-bulan mengalami depresi yang melemahkan, puisi William Cowper mencerminkan karakter Tuhan yang menopang dan menuntunnya untuk beribadah lebih dalam. David Brainerd sangat ingin menghormati Tuhan sehingga, melalui kesepian dalam pelayanan di padang gurun dan penderitaan akibat TBC, dia terus maju, mengubah misi dunia selamanya.
+        \n\nKetika Agustinus menyerahkan kepemimpinan gerejanya pada tahun 426 M, penerusnya begitu diliputi perasaan tidak mampu sehingga ia menyatakan, “Angsa itu diam,” karena takut suara raksasa spiritual itu akan hilang seiring berjalannya waktu. Namun selama 1.600 tahun Agustinus tidak tinggal diam – begitu pula orang-orang yang dengan setia mengumandangkan perkara Kristus setelah dia. Kehidupan mereka telah mengilhami setiap generasi orang percaya dan seharusnya mendorong kita untuk memiliki kerinduan yang lebih besar terhadap Tuhan.</string>
+    <string name="sinopsis5">Dalam The Dangerous Duty of Delight, John Piper mengarahkan hati kita kepada satu-satunya objek hasrat dan kebahagiaan manusia: Tuhan. Piper menunjukkan dari Kitab Suci bahwa mengejar kebahagiaan kita di dalam Kristus bukanlah suatu pilihan bagi orang Kristen, tetapi penting.
+        \n\nIkutlah dalam perjalanan dari keinginan putus asa menuju kesenangan tanpa batas. Pelajari bagaimana Anda diciptakan untuk kepuasan tertinggi di dalam Dia, dan bagaimana perspektif baru ini akan mengubah sikap Anda terhadap ibadah, hubungan, harta benda—dan segalanya.</string>
+    <string name="sinopsis6">Ini adalah kisah lima wanita biasa — Sarah Edwards, Lilias Trotter, Gladys Aylward, Esther Ahn Kim, dan Helen Roseveare — yang memercayai Tuhan mereka yang luar biasa saat Dia memimpin mereka melakukan hal-hal besar bagi kerajaannya.
+        \n\nNoël Piper mengangkat kehidupan dan perbuatan mereka sebagai contoh tentang arti setia sejati.
+        \n\nMempelajari tentang para wanita ini akan menantang pembaca untuk membuat perbedaan bagi Kristus dalam keluarga mereka, di gereja, dan di seluruh dunia.</string>
+    <string name="sinopsis7">Martin Luther meninggal pada dini hari tanggal 18 Februari 1546. Kata-kata terakhirnya menggemakan penemuan penting yang ia buat, dan perjuangkan: Kami adalah pengemis. Ini benar.
+        \n\nMemang benar pengemis - karena Allah menuntut kebenaran yang tidak dapat kita hasilkan. Faktanya, jika kita bisa berproduksi maka akan meniadakan kasih karunia Allah dan makna pengorbanan Yesus (Galatia 2:23). Sebagai perwujudan pengabdiannya pada Kitab Suci, Luther mulai memahami bahwa kita memerlukan “kebenaran asing” di luar diri kita. Kita membutuhkan kebenaran yang dihasilkan dan disediakan bagi kita oleh orang lain.</string>
+    <string name="sinopsis8">Kita telah mendengar kisah Ayub. Kekayaannya hancur, keluarganya diambil, dan tubuhnya sendiri menderita. Kita hanya bisa membayangkan betapa dalamnya kehilangan dan rasa sakitnya. Namun, saat kita merenungkan penderitaan Ayub, apakah kita melihat benang kemurahan Tuhan di dalamnya? Kita semua akan menghadapi penderitaan pada suatu saat dalam hidup kita. Hal ini tidak bisa dihindari. Namun apa yang membuat bencana bisa bertahan bukan karena Allah turut merasakan keterkejutan yang kita alami, namun melalui setiap kobaran api kesakitan dan banjir ketakutan, kedaulatan kebaikan-Nya menopang kita.
+        \n\nPuisi interpretatif John Piper bersama dengan visual menakjubkan fotografer Ric Ergenbright, mengingatkan Anda akan fakta tak tergoyahkan bahwa Tuhan mengatur segala sesuatu untuk tujuan baik-Nya. Biarkan mata Anda melihat seluruh kehidupan – dan Tuhan sendiri – dengan cara yang baru dan penuh kuasa. Dan biarkanlah rohmu beristirahat, mengetahui bahwa Tuhan tidak saja berdaulat, namun juga manis.
+    </string>
+</resources>
