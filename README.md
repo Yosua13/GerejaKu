@@ -1,1 +1,3 @@
+Yosua Reynaldi Manurun
+
 # GerejaKu
