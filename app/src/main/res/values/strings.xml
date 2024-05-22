@@ -17,6 +17,20 @@
     <string name="register_here">Daftar di sini</string>
     <string name="bagikan">Bagikan</string>
 
+    <string name="hello">Hey there, </string>
+    <string name="create_account">Create an Account</string>
+    <string name="welcome">Welcome Back</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="email">Email</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="term_and_conditions">By continuing you accept our Privacy Policy and Term of Use</string>
+    <string name="term_and_conditions_header">Term of Use</string>
+    <string name="register">Register</string>
+    <string name="go_to_login">Already have an account? Login</string>
+
+
     <!--    Register Screen-->
     <string name="register_account">Daftarkan Akun Anda</string>
     <string name="name">Nama</string>
