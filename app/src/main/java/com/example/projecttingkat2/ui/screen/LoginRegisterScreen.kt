@@ -40,13 +40,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.projecttingkat2.R
 import com.example.projecttingkat2.components.ButtonComponent
-import com.example.projecttingkat2.components.CheckboxComponent
 import com.example.projecttingkat2.components.DividerTextComponent
 import com.example.projecttingkat2.components.MyTextFieldComponent
 import com.example.projecttingkat2.components.PasswordMyTextFieldComponent
 import com.example.projecttingkat2.components.UnderLineTextComponent
 import com.example.projecttingkat2.data.LoginViewModel
-import com.example.projecttingkat2.data.UIEvent
+import com.example.projecttingkat2.data.RegisterViewModel
+import com.example.projecttingkat2.data.RegisterUIEvent
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import kotlinx.coroutines.launch
 
@@ -142,7 +142,7 @@ fun LoginPageContent(navHostController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        LoginForm(navHostController)
+        LoginForm(viewModel(), navHostController)
     }
 }
 
@@ -159,7 +159,7 @@ fun RegisterPageContent(navHostController: NavHostController) {
 
 
 @Composable
-fun LoginForm(navHostController: NavHostController) {
+fun LoginForm(loginViewModel: LoginViewModel = viewModel(), navHostController: NavHostController) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -192,93 +192,9 @@ fun LoginForm(navHostController: NavHostController) {
         }
     }
 }
-//@Composable
-//fun LoginForm(
-//    navHostController: NavHostController,
-//    modifier: Modifier = Modifier,
-//) {
-//    var email by rememberSaveable { mutableStateOf("") }
-//    var password by rememberSaveable { mutableStateOf("") }
-//    var emailError by rememberSaveable { mutableStateOf(false) }
-//    var passwordError by rememberSaveable { mutableStateOf(false) }
-//    val context = LocalContext.current
-//
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize(),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = { newEmail ->
-//                email = newEmail
-//                emailError = newEmail.isNullOrEmpty() == null
-//            },
-//            label = {
-//                Text(text = stringResource(R.string.email_address))
-//            },
-//            isError = emailError,
-//            trailingIcon = { IconPicker(emailError) },
-//            supportingText = { ErrorHint(emailError) },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Email,
-//                imeAction = ImeAction.Next
-//            ),
-//            modifier = Modifier
-//                .padding(start = 16.dp, end = 16.dp)
-//                .fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = password,
-//            onValueChange = { newPassword ->
-//                password = newPassword
-//                passwordError = newPassword.isNullOrEmpty() == null
-//            },
-//            label = {
-//                Text(text = stringResource(R.string.password))
-//            },
-//            isError = passwordError,
-//            trailingIcon = { IconPicker(passwordError) },
-//            supportingText = { ErrorHint(passwordError) },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Password,
-//                imeAction = ImeAction.Next
-//            ),
-//            visualTransformation = PasswordVisualTransformation(),
-//            modifier = Modifier
-//                .padding(start = 16.dp, end = 16.dp)
-//                .fillMaxWidth()
-//        )
-//        Spacer(modifier = Modifier.padding(16.dp))
-//        Button(
-//            onClick = {
-//                emailError = email.isEmpty()
-//                passwordError = password.isEmpty()
-//                if (emailError || passwordError) {
-//                    return@Button
-//                }
-//                val message = "Hi, Selamat Datang di Gereja Ku"
-//                navHostController.navigate(Screen.Home.route)
-//                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-//            },
-//            modifier = Modifier.width(300.dp),
-//            colors = ButtonDefaults.buttonColors(Color(0xFF4F1964)),
-//        ) {
-//            Text(
-//                text = stringResource(R.string.login),
-//                fontSize = 18.sp,
-//                modifier = Modifier.padding(4.dp)
-//            )
-//        }
-//        Spacer(modifier = Modifier.padding(16.dp))
-//    }
-//}
 
 @Composable
-fun RegisterForm(navHostController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
+fun RegisterForm(navHostController: NavHostController, registerViewModel: RegisterViewModel = viewModel()) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -291,54 +207,44 @@ fun RegisterForm(navHostController: NavHostController, loginViewModel: LoginView
                 labelValue = stringResource(id = R.string.first_name),
                 painterResource = painterResource(id = R.drawable.profile),
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.FirstNameChanged(it))
+                    registerViewModel.onEvent(RegisterUIEvent.FirstNameChanged(it))
                 },
-                errorStatus = loginViewModel.registrationUIState.value.firstNameError
+                errorStatus = registerViewModel.registrationUIState.value.firstNameError
             )
 
             MyTextFieldComponent(
                 labelValue = stringResource(id = R.string.last_name),
                 painterResource = painterResource(id = R.drawable.profile),
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.LastNameChanged(it))
+                    registerViewModel.onEvent(RegisterUIEvent.LastNameChanged(it))
                 },
-                errorStatus = loginViewModel.registrationUIState.value.lastNameError
+                errorStatus = registerViewModel.registrationUIState.value.lastNameError
             )
 
             MyTextFieldComponent(
                 labelValue = stringResource(id = R.string.email),
                 painterResource = painterResource(id = R.drawable.message),
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                    registerViewModel.onEvent(RegisterUIEvent.EmailChanged(it))
                 },
-                errorStatus = loginViewModel.registrationUIState.value.emailError
+                errorStatus = registerViewModel.registrationUIState.value.emailError
             )
 
             PasswordMyTextFieldComponent(
                 labelValue = stringResource(id = R.string.password),
                 painterResource = painterResource(id = R.drawable.ic_lock),
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                    registerViewModel.onEvent(RegisterUIEvent.PasswordChanged(it))
                 },
-                errorStatus = loginViewModel.registrationUIState.value.passwordError
-            )
-
-            CheckboxComponent(
-                value = stringResource(id = R.string.term_and_conditions),
-                onTextSelected = {
-//                    PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                },
-                onCheckedChange = {
-                    loginViewModel.onEvent(UIEvent.PrivacyPolicyCheckBoxClicked(it))
-                }
+                errorStatus = registerViewModel.registrationUIState.value.passwordError
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
             ButtonComponent(
                 value = stringResource(id = R.string.register),
-                onButtonClicked = { loginViewModel.onEvent(UIEvent.RegisterButtonClicked) },
-                isEnabled = loginViewModel.allValidationsPassed.value,
+                onButtonClicked = { registerViewModel.onEvent(RegisterUIEvent.RegisterButtonClicked) },
+                isEnabled = registerViewModel.allValidationsPassed.value,
                 navHostController
             )
 
@@ -347,120 +253,6 @@ fun RegisterForm(navHostController: NavHostController, loginViewModel: LoginView
         }
     }
 }
-
-//@Composable
-//fun RegisterForm(
-//    modifier: Modifier = Modifier,
-//) {
-//    var name by rememberSaveable { mutableStateOf("") }
-//    var email by rememberSaveable { mutableStateOf("") }
-//    var password by rememberSaveable { mutableStateOf("") }
-//    var nameError by rememberSaveable { mutableStateOf(false) }
-//    var emailError by rememberSaveable { mutableStateOf(false) }
-//    var passwordError by rememberSaveable { mutableStateOf(false) }
-//    val context = LocalContext.current
-//
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .verticalScroll(state = rememberScrollState()),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        Spacer(modifier = Modifier.padding(8.dp))
-//        OutlinedTextField(
-//            value = name,
-//            onValueChange = { newName ->
-//                name = newName
-//                nameError = newName.isNullOrEmpty() == null
-//            },
-//            label = {
-//                Text(text = stringResource(R.string.name))
-//            },
-//            isError = nameError,
-//            trailingIcon = { IconPicker(nameError) },
-//            supportingText = { ErrorHint(nameError) },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Email,
-//                imeAction = ImeAction.Next
-//            ),
-//            modifier = Modifier
-//                .padding(start = 16.dp, end = 16.dp)
-//                .fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = email,
-//            onValueChange = { newEmail ->
-//                email = newEmail
-//                emailError = newEmail.isNullOrEmpty() == null
-//            },
-//            label = {
-//                Text(text = stringResource(R.string.email_address))
-//            },
-//            isError = emailError,
-//            trailingIcon = { IconPicker(emailError) },
-//            supportingText = { ErrorHint(emailError) },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Email,
-//                imeAction = ImeAction.Next
-//            ),
-//            modifier = Modifier
-//                .padding(start = 16.dp, end = 16.dp)
-//                .fillMaxWidth()
-//        )
-//        OutlinedTextField(
-//            value = password,
-//            onValueChange = { newPassword ->
-//                password = newPassword
-//                passwordError = newPassword.isNullOrEmpty() == null
-//            },
-//            label = {
-//                Text(text = stringResource(R.string.password))
-//            },
-//            isError = passwordError,
-//            trailingIcon = { IconPicker(passwordError) },
-//            supportingText = { ErrorHint(passwordError) },
-//            singleLine = true,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Password,
-//                imeAction = ImeAction.Next
-//            ),
-//            visualTransformation = PasswordVisualTransformation(),
-//            modifier = Modifier
-//                .padding(start = 16.dp, end = 16.dp)
-//                .fillMaxWidth()
-//        )
-//        Spacer(modifier = Modifier.padding(16.dp))
-//        Button(
-//            onClick = {
-//                nameError = name.isEmpty()
-//                emailError = email.isEmpty()
-//                passwordError = password.isEmpty()
-//                if (emailError || passwordError || nameError) return@Button
-//            },
-//            modifier = Modifier.width(300.dp),
-//            colors = ButtonDefaults.buttonColors(Color(0xFF4F1964)),
-//        ) {
-//            Text(
-//                text = stringResource(R.string.daftar),
-//                fontSize = 18.sp,
-//                modifier = Modifier.padding(4.dp)
-//            )
-//        }
-//        Spacer(modifier = Modifier.padding(16.dp))
-//        Text(text = stringResource(R.string.or))
-//        Spacer(modifier = Modifier.padding(8.dp))
-//        Image(
-//            painter = painterResource(R.drawable.google),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .size(80.dp)
-//                .clip(CircleShape),
-//        )
-//    }
-//}
 
 @Composable
 fun IconPicker(isError: Boolean) {

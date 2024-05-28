@@ -61,43 +61,36 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.projecttingkat2.firebase.GerejaRepository
+import com.example.projecttingkat2.firebase.BukuRepository
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
-import com.example.projecttingkat2.util.GerejaViewModelFactory
-import com.example.projecttingkat2.viewmodel.GerejaDetailViewModel
+import com.example.projecttingkat2.util.BukuViewModelFactory
+import com.example.projecttingkat2.viewmodel.BukuDetailViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
 import java.io.ByteArrayOutputStream
 import java.util.UUID
-import kotlin.math.sin
 
-const val KEY_ID_GEREJA = "idGereja"
+const val KEY_ID_BUKU = "idBuku"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailGerejaScreen(
+fun DetailBukuScreen(
     navHostController: NavHostController,
     id: String? = null,
 ) {
     val context = LocalContext.current
-    val repository = GerejaRepository()
-    val factory = GerejaViewModelFactory(repository)
-    val viewModel: GerejaDetailViewModel = viewModel(factory = factory)
+    val repository = BukuRepository()
+    val factory = BukuViewModelFactory(repository)
+    val viewModel: BukuDetailViewModel = viewModel(factory = factory)
 
     var judul by rememberSaveable { mutableStateOf("") }
-    var aliran by rememberSaveable { mutableStateOf("") }
-    var lokasi by rememberSaveable { mutableStateOf("") }
-    var link by rememberSaveable { mutableStateOf("") }
-    var jadwal by rememberSaveable { mutableStateOf("") }
-    var deskripsi by rememberSaveable { mutableStateOf("") }
+    var penulis by rememberSaveable { mutableStateOf("") }
+    var sinopsis by rememberSaveable { mutableStateOf("") }
     var gambar by rememberSaveable { mutableStateOf("") }
 
     var judulError by rememberSaveable { mutableStateOf(false) }
-    var aliranError by rememberSaveable { mutableStateOf(false) }
-    var lokasiError by rememberSaveable { mutableStateOf(false) }
-    var linkError by rememberSaveable { mutableStateOf(false) }
-    var jadwalError by rememberSaveable { mutableStateOf(false) }
-    var deskripsiError by rememberSaveable { mutableStateOf(false) }
+    var penulisError by rememberSaveable { mutableStateOf(false) }
+    var sinopsisError by rememberSaveable { mutableStateOf(false) }
     var gambarError by rememberSaveable { mutableStateOf(false) }
 
     val isUploading = remember { mutableStateOf(false) }
@@ -105,14 +98,11 @@ fun DetailGerejaScreen(
 
     LaunchedEffect(true) {
         if (id == null) return@LaunchedEffect
-        val data = viewModel.getGerejaById(id)
+        val data = viewModel.getBukuById(id)
         data?.let {
             judul = it.judul
-            aliran = it.aliran
-            lokasi = it.lokasi
-            link = it.link
-            jadwal = it.jadwal
-            deskripsi = it.deskripsi
+            penulis = it.penulis
+            sinopsis = it.sinopsis
             gambar = it.gambar
         }
     }
@@ -131,9 +121,9 @@ fun DetailGerejaScreen(
                 },
                 title = {
                     if (id == null)
-                        Text(text = "Tambahkan Gereja")
+                        Text(text = "Tambahkan Buku")
                     else
-                        Text(text = "Ubah Gereja")
+                        Text(text = "Ubah Buku")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -142,30 +132,24 @@ fun DetailGerejaScreen(
                 actions = {
                     IconButton(onClick = {
                         judulError = judul.isEmpty()
-                        aliranError = aliran.isEmpty()
-                        lokasiError = lokasi.isEmpty()
-                        linkError = link.isEmpty()
-                        jadwalError = jadwal.isEmpty()
-                        deskripsiError = deskripsi.isEmpty()
+                        penulisError = penulis.isEmpty()
+                        sinopsisError = sinopsis.isEmpty()
                         gambarError = gambar.isEmpty()
-                        if (judulError || aliranError || lokasiError || linkError || jadwalError || deskripsiError || gambarError) {
+                        if (judulError || penulisError || sinopsisError || gambarError) {
                             return@IconButton
                         }
                         if (id == null) {
-                            viewModel.insert(judul, aliran, lokasi, link, jadwal, deskripsi, gambar)
-                            Toast.makeText(context, "Data berhasil dimasukkan", Toast.LENGTH_SHORT).show()
+                            viewModel.insert(judul, penulis, sinopsis, gambar)
+                            Toast.makeText(context, "Buku berhasil dimasukkan", Toast.LENGTH_SHORT).show()
                         } else {
                             viewModel.update(
                                 id.toString(),
                                 judul,
-                                aliran,
-                                lokasi,
-                                link,
-                                jadwal,
-                                deskripsi,
+                                penulis,
+                                sinopsis,
                                 gambar
                             )
-                            Toast.makeText(context, "Data berhasil diubah", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Buku berhasil diubah", Toast.LENGTH_SHORT).show()
                         }
 
                         navHostController.popBackStack()
@@ -177,7 +161,7 @@ fun DetailGerejaScreen(
                         )
                     }
                     if (id != null) {
-                        DeleteAction {
+                        DeleteBuku {
                             viewModel.delete(id.toString())
                             navHostController.popBackStack()
                         }
@@ -186,27 +170,18 @@ fun DetailGerejaScreen(
             )
         },
     ) { contentPadding ->
-        DetailGerejaCard(
+        DetailBukuCard(
             judul = judul,
             onJudulChange = { judul = it },
-            aliran = aliran,
-            onAliranChange = { aliran = it },
-            lokasi = lokasi,
-            onLokasiChange = { lokasi = it },
-            link = link,
-            onLinkChange = { link = it },
-            jadwal = jadwal,
-            onJadwalChange = { jadwal = it },
-            deskripsi = deskripsi,
-            onDeskripsiChange = { deskripsi = it },
+            penulis = penulis,
+            onPenulisChange = { penulis = it },
+            sinopsis = sinopsis,
+            onSinopsisChange = { sinopsis = it },
             gambar = gambar,
             onGambarChange = { gambar = it },
             judulError = judulError,
-            aliranError = aliranError,
-            lokasiError = lokasiError,
-            linkError = linkError,
-            jadwalError = jadwalError,
-            deskripsiError = deskripsiError,
+            penulisError = penulisError,
+            sinopsisError = sinopsisError,
             gambarError = gambarError,
             bitmap = bitmap,
             isUploading = isUploading,
@@ -216,29 +191,19 @@ fun DetailGerejaScreen(
     }
 }
 
-
 @Composable
-fun DetailGerejaCard(
+fun DetailBukuCard(
     judul: String,
     onJudulChange: (String) -> Unit,
-    aliran: String,
-    onAliranChange: (String) -> Unit,
-    lokasi: String,
-    onLokasiChange: (String) -> Unit,
-    link: String,
-    onLinkChange: (String) -> Unit,
-    jadwal: String,
-    onJadwalChange: (String) -> Unit,
-    deskripsi: String,
-    onDeskripsiChange: (String) -> Unit,
+    penulis: String,
+    onPenulisChange: (String) -> Unit,
+    sinopsis: String,
+    onSinopsisChange: (String) -> Unit,
     gambar: String,
     onGambarChange: (String) -> Unit,
     judulError: Boolean,
-    aliranError: Boolean,
-    lokasiError: Boolean,
-    linkError: Boolean,
-    jadwalError: Boolean,
-    deskripsiError: Boolean,
+    penulisError: Boolean,
+    sinopsisError: Boolean,
     gambarError: Boolean,
     bitmap: MutableState<Bitmap?>,
     isUploading: MutableState<Boolean>,
@@ -257,7 +222,7 @@ fun DetailGerejaCard(
         OutlinedTextField(
             value = judul,
             onValueChange = { onJudulChange(it) },
-            label = { Text(text = "Nama Gereja") },
+            label = { Text(text = "Judul Buku") },
             singleLine = true,
             isError = judulError,
             modifier = Modifier
@@ -267,97 +232,45 @@ fun DetailGerejaCard(
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
         if (judulError) {
-            Text(text = "Nama Gereja tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            Text(text = "Judul tidak boleh kosong", color = MaterialTheme.colorScheme.error)
         }
 
         OutlinedTextField(
-            value = aliran,
-            onValueChange = { onAliranChange(it) },
-            label = { Text(text = "Aliran Gereja") },
+            value = penulis,
+            onValueChange = { onPenulisChange(it) },
+            label = { Text(text = "Nama Penulis") },
             singleLine = true,
-            isError = aliranError,
+            isError = penulisError,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
-        if (aliranError) {
-            Text(text = "Aliran Gereja tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+        if (penulisError) {
+            Text(text = "Nama Penulis tidak boleh kosong", color = MaterialTheme.colorScheme.error)
         }
 
         OutlinedTextField(
-            value = lokasi,
-            onValueChange = { onLokasiChange(it) },
-            label = { Text(text = "Lokasi Gereja") },
+            value = sinopsis,
+            onValueChange = { onSinopsisChange(it) },
+            label = { Text(text = "Sinopsis Buku") },
             singleLine = true,
-            isError = lokasiError,
+            isError = sinopsisError,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
         )
-        if (lokasiError) {
-            Text(text = "Lokasi Gereja tidak boleh kosong", color = MaterialTheme.colorScheme.error)
-        }
-
-        OutlinedTextField(
-            value = link,
-            onValueChange = { onLinkChange(it) },
-            label = { Text(text = "Link GMaps Gereja") },
-            singleLine = true,
-            isError = linkError,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
-        )
-        if (linkError) {
-            Text(text = "Link GMaps tidak boleh kosong", color = MaterialTheme.colorScheme.error)
-        }
-
-        OutlinedTextField(
-            value = jadwal,
-            onValueChange = { onJadwalChange(it) },
-            label = { Text(text = "Jadwal Ibadah") },
-            singleLine = true,
-            isError = jadwalError,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
-        )
-        if (jadwalError) {
-            Text(text = "Jadwal Ibadah tidak boleh kosong", color = MaterialTheme.colorScheme.error)
-        }
-
-        OutlinedTextField(
-            value = deskripsi,
-            onValueChange = { onDeskripsiChange(it) },
-            label = { Text(text = "Latar Belakang Gereja") },
-            isError = deskripsiError,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            singleLine = false,
-            maxLines = 4
-        )
-        if (deskripsiError) {
-            Text(
-                text = "Latar Belakang tidak boleh kosong",
-                color = MaterialTheme.colorScheme.error
-            )
+        if (sinopsisError) {
+            Text(text = "Sinopsis Buku tidak boleh kosong", color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Image picker and upload section
-        GerejaImagePicker(bitmap, isUploading) { imageUrl ->
+        BukuImagePicker(bitmap, isUploading) { imageUrl ->
             onGambarChange(imageUrl)
         }
 
@@ -367,7 +280,7 @@ fun DetailGerejaCard(
 
 
 @Composable
-fun DeleteAction(delete: () -> Unit) {
+fun DeleteBuku(delete: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
     IconButton(onClick = { expanded = true }) {
@@ -382,7 +295,7 @@ fun DeleteAction(delete: () -> Unit) {
         ) {
             DropdownMenuItem(
                 text = {
-                    Text(text = "Hapus Gereja")
+                    Text(text = "Hapus Buku")
                 },
                 onClick = {
                     expanded = false
@@ -393,7 +306,7 @@ fun DeleteAction(delete: () -> Unit) {
 }
 
 @Composable
-fun GerejaImagePicker(
+fun BukuImagePicker(
     bitmap: MutableState<Bitmap?>,
     isUploading: MutableState<Boolean>,
     onImageUploaded: (String) -> Unit
@@ -406,7 +319,7 @@ fun GerejaImagePicker(
             val inputStream = context.contentResolver.openInputStream(it)
             val selectedBitmap = BitmapFactory.decodeStream(inputStream)
             bitmap.value = selectedBitmap
-            GerejaUploadImageToFirebase(selectedBitmap, isUploading, onImageUploaded)
+            BookUploadImageToFirebase(selectedBitmap, isUploading, onImageUploaded)
         }
     }
 
@@ -433,13 +346,13 @@ fun GerejaImagePicker(
     }
 }
 
-fun GerejaUploadImageToFirebase(
+fun BookUploadImageToFirebase(
     bitmap: Bitmap,
     isUploading: MutableState<Boolean>,
     onImageUploaded: (String) -> Unit
 ) {
     val storageRef = Firebase.storage.reference
-    val imagesRef = storageRef.child("images/gereja_images/${UUID.randomUUID()}.jpg")
+    val imagesRef = storageRef.child("images/buku_images/${UUID.randomUUID()}.jpg")
 
     val baos = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
@@ -466,8 +379,8 @@ fun GerejaUploadImageToFirebase(
 
 @Preview(showBackground = true)
 @Composable
-fun DetailGerejaScreenPreview() {
+fun DetailBukuScreenPreview() {
     ProjectTingkat2Theme {
-        DetailGerejaScreen(rememberNavController())
+        DetailBukuScreen(rememberNavController())
     }
 }

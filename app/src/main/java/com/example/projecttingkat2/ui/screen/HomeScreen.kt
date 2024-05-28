@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -27,8 +29,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,24 +42,25 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.projecttingkat2.R
-import com.example.projecttingkat2.database.GerejaKuDb
-import com.example.projecttingkat2.viewmodel.GerejaViewModel
+import com.example.projecttingkat2.firebase.GerejaRepository
 import com.example.projecttingkat2.model.Gereja
 import com.example.projecttingkat2.navigation.Screen
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import com.example.projecttingkat2.util.GerejaViewModelFactory
+import com.example.projecttingkat2.viewmodel.GerejaDetailViewModel
 
 @Composable
 fun HomeScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val db = GerejaKuDb.getInstance(context)
-    val factory = GerejaViewModelFactory(db.gerejaDao)
-    val viewModel: GerejaViewModel = viewModel(factory = factory)
-    val data by viewModel.data.collectAsState()
+    val repository = GerejaRepository()
+    val factory = GerejaViewModelFactory(repository)
+    val viewModel: GerejaDetailViewModel = viewModel(factory = factory)
+    val gerejaList by viewModel.gerejaList.collectAsState()
 
     Scaffold(
         bottomBar = { HomeBottomNavigation(navHostController) },
@@ -77,9 +82,9 @@ fun HomeScreen(
             modifier = modifier.fillMaxSize(),
             contentPadding = contentPadding
         ) {
-            items(data) { item ->
-                GerejaCard(gereja = item) {
-                    navHostController.navigate(Screen.GerejaFormUbah.gerejaId(item.id))
+            items(gerejaList) { gereja ->
+                GerejaCard(gereja = gereja) {
+                    navHostController.navigate(Screen.GerejaFormUbah.gerejaId(gereja.id))
                 }
             }
         }
@@ -163,6 +168,12 @@ fun GerejaCard(
     gereja: Gereja,
     onClick: () -> Unit,
 ) {
+    val imageRequest = ImageRequest.Builder(LocalContext.current)
+        .data(gereja.gambar)
+        .crossfade(true)
+        .error(R.drawable.ic_launcher_foreground)  // Add a placeholder for error
+        .build()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,29 +186,31 @@ fun GerejaCard(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-//            Image(
-//                painter = painterResource(gereja.gereja),
-//                contentDescription = stringResource(gereja.judul),
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .height(200.dp)
-//                    .width(400.dp)
-//                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
-//            )
+            AsyncImage(
+                model = imageRequest,
+                contentDescription = gereja.judul,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(200.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
+            )
             Row(
                 modifier = Modifier
                     .padding(start = 16.dp, bottom = 8.dp)
             ) {
-                Text(
-                    text = gereja.judul,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = gereja.aliran,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 10.dp, start = 32.dp)
-                )
+                Column {
+                    Text(
+                        text = gereja.judul,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = gereja.aliran,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                }
             }
         }
     }

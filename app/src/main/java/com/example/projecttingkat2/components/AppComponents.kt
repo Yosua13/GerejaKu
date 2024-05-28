@@ -60,22 +60,6 @@ import com.example.projecttingkat2.ui.theme.GrayColor
 import com.example.projecttingkat2.ui.theme.TextColor
 import com.example.projecttingkat2.ui.theme.componentShapes
 
-@Composable
-fun NormalTextComponent(value: String) {
-    Text(
-        text = value,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 40.dp),
-        style = TextStyle(
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Normal,
-            fontStyle = FontStyle.Normal
-        ),
-        color = colorResource(id = R.color.colorText),
-        textAlign = TextAlign.Center
-    )
-}
 
 @Composable
 fun HeadingTextComponent(value: String) {
@@ -203,62 +187,13 @@ fun PasswordMyTextFieldComponent(
     )
 }
 
-@Composable
-fun CheckboxComponent(value: String, onTextSelected: (String) -> Unit, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(56.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val checkState = remember {
-            mutableStateOf(false)
-        }
-        Checkbox(
-            checked = checkState.value,
-            onCheckedChange = {
-                checkState.value = !checkState.value
-                onCheckedChange.invoke(it)
-            }
-        )
-        ClickableTextComponent(value, onTextSelected)
-    }
-}
 
 @Composable
-fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit) {
-    val initialText = "By continuing you accept our "
-    val privacyPolicyText = "Privacy Policy"
-    val andText = " and "
-    val termsAndConditionsText = "Term of Use"
-
-    val annotatedString = buildAnnotatedString {
-        append(initialText)
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            pushStringAnnotation(tag = privacyPolicyText, annotation = privacyPolicyText)
-            append(privacyPolicyText)
-        }
-        append(andText)
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-            pushStringAnnotation(tag = termsAndConditionsText, annotation = termsAndConditionsText)
-            append(termsAndConditionsText)
-        }
-    }
-
-    ClickableText(text = annotatedString, onClick = { offset ->
-        annotatedString.getStringAnnotations(offset, offset)
-            .firstOrNull()?.also { span ->
-                Log.d("ClickableTextComponent", "{$span}, offset: $offset")
-
-                if (span.item == termsAndConditionsText || span.item == privacyPolicyText) {
-                    onTextSelected(span.item)
-                }
-            }
-    })
-}
-
-@Composable
-fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boolean = false, navHostController: NavHostController) {
+fun ButtonComponent(
+    value: String,
+    onButtonClicked: () -> Unit,
+    isEnabled: Boolean = false,
+    navHostController: NavHostController) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -267,6 +202,48 @@ fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boole
             onButtonClicked.invoke()
             navHostController.navigate(Screen.Home.route)
                   },
+        contentPadding = PaddingValues(),
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        enabled = isEnabled
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(48.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.secondary,
+                            MaterialTheme.colorScheme.primary
+                        )
+                    ),
+                    shape = RoundedCornerShape(50.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = value,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun LogoutButtonComponent(
+    value: String,
+    onButtonClicked: () -> Unit,
+    isEnabled: Boolean = false,
+    navHostController: NavHostController) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(48.dp),
+        onClick = {
+            onButtonClicked.invoke()
+            navHostController.navigate(Screen.LoginRegister.route)
+        },
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(Color.Transparent),
         enabled = isEnabled

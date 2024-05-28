@@ -7,66 +7,95 @@ import com.example.projecttingkat2.data.rules.Validator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
-class LoginViewModel : ViewModel() {
+class RegisterViewModel : ViewModel() {
 
-    private val TAG = LoginViewModel::class.simpleName
+    private val TAG = RegisterViewModel::class.simpleName
 
-    var loginUIState = mutableStateOf(LoginUIState())
+    var registrationUIState = mutableStateOf(RegistrationUIState())
 
     var allValidationsPassed = mutableStateOf(false)
-    var loginInProgress = mutableStateOf(false)
 
-    fun onEvent(event: LoginUIEvent) {
+    fun onEvent(event: RegisterUIEvent) {
         validateDataWithRules()
         when (event) {
-            is LoginUIEvent.EmailChanged -> {
-                loginUIState.value = loginUIState.value.copy(
+            is RegisterUIEvent.FirstNameChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(
+                    firstName = event.firstName
+                )
+                printState()
+            }
+
+            is RegisterUIEvent.LastNameChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(
+                    lastName = event.lastName
+                )
+                printState()
+            }
+
+            is RegisterUIEvent.EmailChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(
                     email = event.email
                 )
                 printState()
             }
 
-            is LoginUIEvent.PasswordChanged -> {
-                loginUIState.value = loginUIState.value.copy(
+            is RegisterUIEvent.PasswordChanged -> {
+                registrationUIState.value = registrationUIState.value.copy(
                     password = event.password
                 )
                 printState()
             }
 
-            is LoginUIEvent.LoginButtonClicked -> {
-                login()
+            is RegisterUIEvent.RegisterButtonClicked -> {
+                signUp()
             }
         }
     }
 
-    private fun login() {
-
+    private fun signUp() {
+        Log.d(TAG, "Inside_signUp")
+        printState()
+        createUserInFirebase(
+            email = registrationUIState.value.email,
+            password = registrationUIState.value.password
+        )
     }
 
     private fun validateDataWithRules() {
 
+        val fNameResult = Validator.validateFirstName(
+            fName = registrationUIState.value.firstName
+        )
+        val lNameResult = Validator.validateLastName(
+            lName = registrationUIState.value.lastName
+        )
         val emailResult = Validator.validateEmail(
-            email = loginUIState.value.email
+            email = registrationUIState.value.email
         )
         val passwordResult = Validator.validatePassword(
-            password = loginUIState.value.password
+            password = registrationUIState.value.password
         )
 
         Log.d(TAG, "Inside_validateDataWithRules")
+        Log.d(TAG, "fNameResult: $fNameResult")
+        Log.d(TAG, "lNameResult: $lNameResult")
         Log.d(TAG, "emailResult: $emailResult")
         Log.d(TAG, "passwordResult: $passwordResult")
 
-        loginUIState.value = loginUIState.value.copy(
+        registrationUIState.value = registrationUIState.value.copy(
+            firstNameError = fNameResult.status,
+            lastNameError = lNameResult.status,
             emailError = emailResult.status,
             passwordError = passwordResult.status
         )
 
-        allValidationsPassed.value = emailResult.status && passwordResult.status
+        allValidationsPassed.value = fNameResult.status && lNameResult.status &&
+                emailResult.status && passwordResult.status
     }
 
     private fun printState() {
         Log.d(TAG, "Inside_printState")
-        Log.d(TAG, loginUIState.value.toString())
+        Log.d(TAG, registrationUIState.value.toString())
     }
 
     private fun createUserInFirebase(email: String, password: String) {
