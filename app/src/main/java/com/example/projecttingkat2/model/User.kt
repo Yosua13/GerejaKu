@@ -2,10 +2,11 @@ package com.example.projecttingkat2.model
 
 
 data class User(
-    val id: Long = 0L,
-    val name: String,
-    val email: String,
-    val nomorHp: String,
-    val tanggal: String,
-    val password: String
+    var id: String = "",
+    var firstName: String = "",
+    var lastName: String = "",
+    var email: String = "",
+    var password: String = "",
+//    var nomorHp: String = "",
+//    var tanggal: String = "",
 )

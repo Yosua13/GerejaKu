@@ -1,10 +1,12 @@
 package com.example.projecttingkat2.navigation
 
+import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BERITA
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BUKU
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_GEREJA
 
 sealed class Screen(val route: String) {
 
+    data object LandingPage: Screen("landingPageScreen")
     data object LoginRegister: Screen("loginRegisterScreen")
     data object Home: Screen("homeScreen")
     data object GerejaFormBaru: Screen("gerejaDetailScreen")
@@ -17,5 +19,9 @@ sealed class Screen(val route: String) {
         fun bukuId(id: String) = "bukuDetailScreen/$id"
     }
     data object BeritaAcara: Screen("beritaAcaraScreen")
+    data object BeritaFormBaru: Screen("beritaAcaraDetailScreen")
+    data object BeritaFormUbah: Screen("beritaAcaraDetailScreen/{$KEY_ID_BERITA}") {
+        fun beritaId(id: String) = "beritaAcaraDetailScreen/$id"
+    }
     data object Profil: Screen("profilScreen")
 }

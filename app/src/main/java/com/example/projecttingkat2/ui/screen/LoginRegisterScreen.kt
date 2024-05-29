@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -44,6 +46,7 @@ import com.example.projecttingkat2.components.DividerTextComponent
 import com.example.projecttingkat2.components.MyTextFieldComponent
 import com.example.projecttingkat2.components.PasswordMyTextFieldComponent
 import com.example.projecttingkat2.components.UnderLineTextComponent
+import com.example.projecttingkat2.data.LoginUIEvent
 import com.example.projecttingkat2.data.LoginViewModel
 import com.example.projecttingkat2.data.RegisterViewModel
 import com.example.projecttingkat2.data.RegisterUIEvent
@@ -160,41 +163,74 @@ fun RegisterPageContent(navHostController: NavHostController) {
 
 @Composable
 fun LoginForm(loginViewModel: LoginViewModel = viewModel(), navHostController: NavHostController) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
+
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(8.dp)
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
-            MyTextFieldComponent(
-                labelValue = stringResource(id = R.string.email),
-                painterResource = painterResource(id = R.drawable.message),
-                onTextSelected = {
 
-                }
-            )
-            PasswordMyTextFieldComponent(
-                labelValue = stringResource(id = R.string.password),
-                painterResource = painterResource(id = R.drawable.ic_lock),
-                onTextSelected = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Spacer(modifier = Modifier.height(20.dp))
 
-                }
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            UnderLineTextComponent(stringResource(id = R.string.forgot_password))
-            Spacer(modifier = Modifier.height(20.dp))
-            ButtonComponent(value = stringResource(id = R.string.login), onButtonClicked = {  }, isEnabled = false, navHostController)
-            Spacer(modifier = Modifier.height(20.dp))
-            DividerTextComponent()
+                MyTextFieldComponent(
+                    labelValue = stringResource(id = R.string.email),
+                    painterResource(id = R.drawable.message),
+                    onTextSelected = {
+                        loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
+                    },
+                    errorStatus = loginViewModel.loginUIState.value.emailError
+                )
+
+                PasswordMyTextFieldComponent(
+                    labelValue = stringResource(id = R.string.password),
+                    painterResource(id = R.drawable.ic_lock),
+                    onTextSelected = {
+                        loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
+                    },
+                    errorStatus = loginViewModel.loginUIState.value.passwordError
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+//                UnderLineTextComponent(value = stringResource(id = R.string.forgot_password))
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                ButtonComponent(
+                    value = stringResource(id = R.string.login),
+                    onButtonClicked = {
+                        loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)
+                    },
+                    isEnabled = loginViewModel.allValidationsPassed.value,
+                    navHostController
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+//                DividerTextComponent()
+
+            }
+        }
+
+        if (loginViewModel.loginInProgress.value) {
+            CircularProgressIndicator()
         }
     }
 }
 
 @Composable
-fun RegisterForm(navHostController: NavHostController, registerViewModel: RegisterViewModel = viewModel()) {
+fun RegisterForm(
+    navHostController: NavHostController,
+    registerViewModel: RegisterViewModel = viewModel(),
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()

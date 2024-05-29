@@ -4,12 +4,12 @@ object Validator {
 
     fun validateFirstName(fName: String): ValidationResult {
         return ValidationResult(
-            (!fName.isNullOrEmpty() && fName.length >= 4)
+            (!fName.isNullOrEmpty() && fName.length >= 3)
         )
     }
     fun validateLastName(lName: String): ValidationResult {
         return ValidationResult(
-            (!lName.isNullOrEmpty() && lName.length >= 4)
+            (!lName.isNullOrEmpty() && lName.length >= 3)
         )
     }
     fun validateEmail(email: String): ValidationResult {
@@ -19,15 +19,10 @@ object Validator {
     }
     fun validatePassword(password: String): ValidationResult {
         return ValidationResult(
-            (!password.isNullOrEmpty() && password.length >= 4)
+            (!password.isNullOrEmpty() && password.length >= 6)
         )
     }
 
-    fun validatePrivacyPolicyAcceptance(statusValue: Boolean): ValidationResult {
-        return ValidationResult(
-            statusValue
-        )
-    }
 }
 
 data class ValidationResult(

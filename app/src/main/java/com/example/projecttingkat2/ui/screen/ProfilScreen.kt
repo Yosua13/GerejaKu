@@ -1,7 +1,9 @@
 package com.example.projecttingkat2.ui.screen
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,16 +56,27 @@ import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projecttingkat2.firebase.ProfilRepository
+import com.example.projecttingkat2.util.ProfileViewModelFactory
+import com.example.projecttingkat2.viewmodel.ProfileDetailViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.Calendar
@@ -71,6 +84,13 @@ import java.util.Calendar
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilScreen(navHostController: NavHostController) {
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
+    val repository = ProfilRepository(auth, firestore)
+    val factory = ProfileViewModelFactory(repository)
+    val viewModel: ProfileDetailViewModel = viewModel(factory = factory)
+
     Scaffold(
         topBar = {
             Column(
@@ -92,7 +112,11 @@ fun ProfilScreen(navHostController: NavHostController) {
             ProfilBottomNavigation(navHostController)
         },
     ) { contentPadding ->
-        ProfilCard(navHostController, modifier = Modifier.padding(contentPadding))
+        ProfilScreenContent(
+            modifier = Modifier.padding(contentPadding),
+            viewModel = viewModel,
+            navHostController = navHostController
+        )
     }
 }
 
@@ -168,200 +192,102 @@ private fun ProfilBottomNavigation(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
-fun ProfilCard(
-    navHostController: NavHostController,
-    modifier: Modifier = Modifier,
+fun ProfilScreenContent(
+    modifier: Modifier,
+    viewModel: ProfileDetailViewModel,
+    navHostController: NavHostController
 ) {
-    var nama by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var noHp by rememberSaveable { mutableStateOf("") }
-    var namaError by rememberSaveable { mutableStateOf(false) }
-    var emailError by rememberSaveable { mutableStateOf(false) }
-    var passwordError by rememberSaveable { mutableStateOf(false) }
-    var noHpError by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
+
+    var firstName by remember { mutableStateOf(currentUser?.firstName ?: "") }
+    var lastName by remember { mutableStateOf(currentUser?.lastName ?: "") }
+    var email by remember { mutableStateOf(currentUser?.email ?: "") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    val updateProfile = {
+        if (password == confirmPassword) {
+            Log.d("ProfilScreenContent", "Attempting to update profile")
+            viewModel.updateProfile(
+                firstName = firstName,
+                lastName = lastName,
+                email = email,
+                password = password.takeIf { it.isNotEmpty() },
+                onSuccess = {
+                    Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
+                    navHostController.popBackStack()
+                },
+                onFailure = { e ->
+                    Log.e("ProfilScreenContent", "Failed to update profile: ${e.message}", e)
+                    Toast.makeText(context, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            )
+        } else {
+            Log.e("ProfilScreenContent", "Passwords do not match")
+            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Nama")
         OutlinedTextField(
-            value = nama,
-            onValueChange = { newNama ->
-                nama = newNama
-                namaError = newNama.isNullOrEmpty() == null
-            },
-            label = {
-                Text(text = stringResource(R.string.name))
-            },
-            isError = namaError,
-            trailingIcon = { IconPicker(namaError) },
-            supportingText = { ErrorHint(namaError) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
+            value = firstName,
+            onValueChange = { firstName = it },
+            label = { Text("First Name") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.firstNameError
         )
-        Text(text = "Email")
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = { Text("Last Name") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = uiState.lastNameError
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = email,
-            onValueChange = { newEmail ->
-                email = newEmail
-                emailError = newEmail.isNullOrEmpty() == null
-            },
-            label = {
-                Text(text = stringResource(R.string.email_address))
-            },
-            isError = emailError,
-            trailingIcon = { IconPicker(emailError) },
-            supportingText = { ErrorHint(emailError) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isError = uiState.emailError
         )
-        Text(text = "No HP")
-        OutlinedTextField(
-            value = noHp,
-            onValueChange = { newNomorHp ->
-                noHp = newNomorHp
-                noHpError = newNomorHp.isNullOrEmpty() == null
-            },
-            label = {
-                Text(text = stringResource(R.string.no_hp))
-            },
-            isError = noHpError,
-            trailingIcon = { IconPicker(noHpError) },
-            supportingText = { ErrorHint(noHpError) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-        )
-
-        // Tanggal Lahir
-        Text(text = "Tanggal Lahir")
-        CalenderField()
-
-        Text(text = "Kata Sandi")
+        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = password,
-            onValueChange = { newPassword ->
-                password = newPassword
-                passwordError = newPassword.isNullOrEmpty() == null
-            },
-            label = {
-                Text(text = stringResource(R.string.password))
-            },
-            isError = passwordError,
-            trailingIcon = { IconPicker(passwordError) },
-            supportingText = { ErrorHint(passwordError) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
-            ),
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            isError = uiState.passwordError
         )
-        Spacer(modifier = Modifier.padding(16.dp))
-        Button(
-            onClick = {
-                emailError = email.isEmpty()
-                passwordError = password.isEmpty()
-                namaError = nama.isEmpty()
-                noHpError = noHp.isEmpty()
-                if (emailError || passwordError || namaError || noHpError) {
-                    return@Button
-                }
-                val message = "Hi, Selamat Datang di Gereja Ku"
-                navHostController.navigate(Screen.Home.route)
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.width(300.dp),
-            colors = ButtonDefaults.buttonColors(Color(0xFF4F1964)),
-        ) {
-            Text(
-                text = stringResource(R.string.login),
-                fontSize = 18.sp,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-        Spacer(modifier = Modifier.padding(16.dp))
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun CalenderField() {
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-
-    val formattedDate by remember {
-        derivedStateOf {
-            DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate)
-        }
-    }
-
-    val dateDialogState = rememberMaterialDialogState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Tanggal") },
-            trailingIcon = {
-                IconButton(onClick = { dateDialogState.show() }) {
-                    Icon(imageVector = Icons.Default.CalendarToday, contentDescription = "Pilih Tanggal")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
-
-        // Dialog untuk pemilih tanggal
-        MaterialDialog(
-            dialogState = dateDialogState,
-            buttons = {
-                positiveButton(text = "OK") {
-                    // Simpan tanggal terpilih dan perbarui tampilan
-                    dateDialogState.hide()
-                }
-                negativeButton(text = "Batal") {
-                    dateDialogState.hide()
-                }
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = updateProfile,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            datepicker(
-                initialDate = pickedDate,
-                onDateChange = { pickedDate = it }
-            )
+            Text(text = "Update Profile")
         }
     }
 }
