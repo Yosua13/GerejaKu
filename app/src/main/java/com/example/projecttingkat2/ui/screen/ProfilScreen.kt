@@ -3,94 +3,74 @@ package com.example.projecttingkat2.ui.screen
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Church
 import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.projecttingkat2.R
+import com.example.projecttingkat2.model.User
 import com.example.projecttingkat2.navigation.Screen
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.projecttingkat2.firebase.ProfilRepository
-import com.example.projecttingkat2.util.ProfileViewModelFactory
-import com.example.projecttingkat2.viewmodel.ProfileDetailViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ofPattern
-import java.util.Calendar
+import com.example.projecttingkat2.viewmodel.UserViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilScreen(navHostController: NavHostController) {
-    val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
-    val firestore = FirebaseFirestore.getInstance()
-    val repository = ProfilRepository(auth, firestore)
-    val factory = ProfileViewModelFactory(repository)
-    val viewModel: ProfileDetailViewModel = viewModel(factory = factory)
-
     Scaffold(
         topBar = {
             Column(
@@ -103,8 +83,8 @@ fun ProfilScreen(navHostController: NavHostController) {
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(280.dp)
-                        .padding(bottom = 8.dp)
+                        .padding(bottom = 8.dp),
+                    contentScale = ContentScale.FillWidth
                 )
             }
         },
@@ -112,11 +92,7 @@ fun ProfilScreen(navHostController: NavHostController) {
             ProfilBottomNavigation(navHostController)
         },
     ) { contentPadding ->
-        ProfilScreenContent(
-            modifier = Modifier.padding(contentPadding),
-            viewModel = viewModel,
-            navHostController = navHostController
-        )
+        ProfilCard(viewModel(), user = User(), modifier = Modifier.padding(contentPadding))
     }
 }
 
@@ -192,111 +168,250 @@ private fun ProfilBottomNavigation(
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProfilScreenContent(
-    modifier: Modifier,
-    viewModel: ProfileDetailViewModel,
-    navHostController: NavHostController
+fun ProfilCard(
+    viewModel: UserViewModel,
+    user: User,
+    modifier: Modifier = Modifier
 ) {
+
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
+    val focusManager = LocalFocusManager.current
+
+    var firstName by remember { mutableStateOf(user.firstName) }
+    var lastName by remember { mutableStateOf(user.lastName) }
+    var email by remember { mutableStateOf(user.email) }
+    var newPassword  by remember { mutableStateOf(user.password) }
+    var nomorHP by remember { mutableStateOf(user.nomorHp) }
+    var tanggal by remember { mutableStateOf(user.tanggal) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var role by remember { mutableStateOf(user.role ?: "") }
+
+    var firstNameError by remember { mutableStateOf(false) }
+    var lastNameError by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var newPasswordError  by remember { mutableStateOf(false) }
+    var noHPError by remember { mutableStateOf(false) }
+    var tanggalError by remember { mutableStateOf(false) }
+
+    var expanded by remember { mutableStateOf(false) }
     val currentUser by viewModel.currentUser.collectAsState()
+    val updateSuccess by viewModel.updateSuccess.collectAsState()
+    val updateError by viewModel.updateError.collectAsState()
 
-    var firstName by remember { mutableStateOf(currentUser?.firstName ?: "") }
-    var lastName by remember { mutableStateOf(currentUser?.lastName ?: "") }
-    var email by remember { mutableStateOf(currentUser?.email ?: "") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-
-    val updateProfile = {
-        if (password == confirmPassword) {
-            Log.d("ProfilScreenContent", "Attempting to update profile")
-            viewModel.updateProfile(
-                firstName = firstName,
-                lastName = lastName,
-                email = email,
-                password = password.takeIf { it.isNotEmpty() },
-                onSuccess = {
-                    Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
-                    navHostController.popBackStack()
-                },
-                onFailure = { e ->
-                    Log.e("ProfilScreenContent", "Failed to update profile: ${e.message}", e)
-                    Toast.makeText(context, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            )
-        } else {
-            Log.e("ProfilScreenContent", "Passwords do not match")
-            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+    LaunchedEffect(currentUser) {
+        currentUser?.let {
+            firstName = it.firstName
+            lastName = it.lastName
+            email = it.email
+            nomorHP = it.nomorHp
+            tanggal = it.tanggal
+            role = it.role
         }
     }
 
-    Column(
+    LaunchedEffect(updateSuccess) {
+        if (updateSuccess) {
+            Toast.makeText(context, "Update Successful", Toast.LENGTH_SHORT).show()
+            Log.d("UpdateUserScreen", "User profile updated successfully")
+        }
+    }
+
+    LaunchedEffect(updateError) {
+        updateError?.let {
+            Toast.makeText(context, "Update Failed: $it", Toast.LENGTH_SHORT).show()
+            Log.d("UpdateUserScreen", "Error updating user profile: $it")
+        }
+    }
+
+    Surface(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(Color.White)
     ) {
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth(),
-            isError = uiState.firstNameError
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") },
-            modifier = Modifier.fillMaxWidth(),
-            isError = uiState.lastNameError
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            isError = uiState.emailError
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = uiState.passwordError
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = updateProfile,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            Text(text = "Update Profile")
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text(text = "Nama Depan") },
+                singleLine = true,
+                isError = firstNameError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape = CircleShape
+            )
+            if (firstNameError) {
+                Text(text = "Nama Depan tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text(text = "Nama Belakang") },
+                singleLine = true,
+                isError = lastNameError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape = CircleShape
+            )
+            if (lastNameError) {
+                Text(text = "Nama Belakang tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text(text = "Alamat Surel") },
+                singleLine = true,
+                isError = emailError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                readOnly = true,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape = CircleShape
+            )
+            if (emailError) {
+                Text(text = "Alamat Surel tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = newPassword,
+                onValueChange = { newPassword = it },
+                label = { Text("Kata Sandi Baru") },
+                singleLine = true,
+                isError = newPasswordError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                shape = CircleShape,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+
+                    IconButton(onClick = {
+                        passwordVisible = !passwordVisible
+                    }) {
+                        Icon(imageVector = image, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                    }
+                }
+            )
+            if (newPasswordError) {
+                Text(
+                    text = "Konfirmasi Kata Sandi tidak boleh kosong",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = nomorHP,
+                onValueChange = { nomorHP = it },
+                label = { Text(text = "Nomor HP") },
+                singleLine = true,
+                isError = noHPError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape = CircleShape
+            )
+            if (noHPError) {
+                Text(text = "Nomor HP tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = tanggal,
+                onValueChange = { tanggal = it },
+                label = { Text(text = "Tanggal Lahir") },
+                singleLine = true,
+                isError = tanggalError,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+                shape = CircleShape,
+            )
+            if (tanggalError) {
+                Text(text = "Tanggal Lahir tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = role,
+                    onValueChange = { role = it },
+                    label = { Text("Peran") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    firstNameError = firstName.isEmpty()
+                    lastNameError = lastName.isEmpty()
+                    emailError = email.isEmpty()
+                    newPasswordError = newPassword.isEmpty()
+                    noHPError = nomorHP.isEmpty()
+                    tanggalError = tanggal.isEmpty()
+
+
+                    // If all fields are valid, proceed with update
+                    if (!newPassword.isBlank()) {
+                        viewModel.updateProfile(
+                            firstName = firstName,
+                            lastName = lastName,
+                            email = email,
+                            newPassword = if (newPassword.isBlank()) null else newPassword,
+                            nomorHP = nomorHP,
+                            tanggal = tanggal,
+                            role = role,
+                            onSuccess = {
+                                Toast.makeText(context, "Update Successful", Toast.LENGTH_SHORT).show()
+                                Log.d("UpdateUserScreen", "User profile updated successfully")
+                            },
+                            onFailure = {
+                                    updateError?.let {
+                                    Toast.makeText(context, "Update Failed: $it", Toast.LENGTH_SHORT).show()
+                                    Log.d("UpdateUserScreen", "Error updating user profile: $it")
+                                    }
+                            }
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Update")
+            }
         }
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun BookScreenPreview() {
+fun ProfileScreenPreview() {
     ProjectTingkat2Theme {
         ProfilScreen(rememberNavController())
     }

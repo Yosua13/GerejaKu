@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.projecttingkat2.model.User
 import com.example.projecttingkat2.ui.screen.BeritaAcaraScreen
 import com.example.projecttingkat2.ui.screen.BookScreen
 import com.example.projecttingkat2.ui.screen.HomeScreen
@@ -85,7 +86,7 @@ fun SetupNavigationGraph(navHostController: NavHostController = rememberNavContr
             DetailBeritaAcaraScreen(navHostController, id)
         }
         composable(route = Screen.Profil.route) {
-            ProfilScreen(viewModel())
+            ProfilScreen(navHostController)
         }
     }
 }
