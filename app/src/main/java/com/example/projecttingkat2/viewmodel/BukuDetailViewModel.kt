@@ -69,4 +69,18 @@ class BukuDetailViewModel(private val repository: BukuRepository) : ViewModel() 
         Log.d("BukuDetailViewModel", "Fetching buku with id: $id")
         return repository.getBukuById(id)
     }
+
+    fun searchBuku(keyword: String) {
+        viewModelScope.launch {
+            _bukuList.value = if (keyword.isNotEmpty()) {
+                // Jika ada kata kunci, filter daftar gereja sesuai dengan kata kunci
+                bukuList.value.filter { buku ->
+                    buku.judul.contains(keyword, ignoreCase = true)
+                }
+            } else {
+                // Jika tidak ada kata kunci, tampilkan seluruh daftar gereja
+                repository.getBukuList()
+            }
+        }
+    }
 }

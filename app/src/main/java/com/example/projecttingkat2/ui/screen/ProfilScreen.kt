@@ -23,9 +23,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,6 +40,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -68,11 +72,44 @@ import com.example.projecttingkat2.navigation.Screen
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import com.example.projecttingkat2.viewmodel.UserViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfilScreen(navHostController: NavHostController) {
+    val userViewModel: UserViewModel = viewModel()
+
     Scaffold(
         topBar = {
+            TopAppBar(
+                title = {
+                    Column(
+                        modifier = Modifier.background(Color.White),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.profiledoa),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            contentScale = ContentScale.FillWidth
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        userViewModel.logout()
+                        navHostController.navigate(Screen.LoginRegister.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Cancel,
+                            contentDescription = "Logout",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
             Column(
                 modifier = Modifier.background(Color.White),
                 verticalArrangement = Arrangement.Center,

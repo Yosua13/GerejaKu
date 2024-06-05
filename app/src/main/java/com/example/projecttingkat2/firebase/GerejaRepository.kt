@@ -53,4 +53,11 @@ class GerejaRepository {
         val document = collection.document()
         return document.id
     }
+
+    suspend fun getGerejaList(): List<Gereja> {
+        val snapshot = collection.get().await()
+        return snapshot.documents.map { document ->
+            document.toObject(Gereja::class.java)!!.copy(id = document.id)
+        }
+    }
 }

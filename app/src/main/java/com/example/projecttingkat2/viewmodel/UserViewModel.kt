@@ -139,6 +139,13 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    // Fungsi untuk logout
+    fun logout() {
+        // Hapus informasi pengguna dari state
+        _currentUser.value = null
+        // Tambahkan logika tambahan jika perlu, misalnya menghapus token dari penyimpanan
+    }
+
     private fun saveUserToFirestore(user: User) {
         firestore.collection("users").document(user.uid)
             .set(user)

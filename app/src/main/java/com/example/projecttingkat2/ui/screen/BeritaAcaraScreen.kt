@@ -46,49 +46,54 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.projecttingkat2.R
 import com.example.projecttingkat2.firebase.BeritaAcaraRepository
-import com.example.projecttingkat2.firebase.GerejaRepository
 import com.example.projecttingkat2.model.BeritaAcara
-import com.example.projecttingkat2.model.Gereja
 import com.example.projecttingkat2.navigation.Screen
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import com.example.projecttingkat2.util.BeritaAcaraViewModelFactory
-import com.example.projecttingkat2.util.GerejaViewModelFactory
 import com.example.projecttingkat2.viewmodel.BeritaAcaraDetailViewModel
-import com.example.projecttingkat2.viewmodel.GerejaDetailViewModel
+import com.example.projecttingkat2.viewmodel.UserViewModel
 
 @Composable
 fun BeritaAcaraScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val userViewModel: UserViewModel = viewModel()
+    val currentUser by userViewModel.currentUser.collectAsState()
+
     val repository = BeritaAcaraRepository()
     val factory = BeritaAcaraViewModelFactory(repository)
     val viewModel: BeritaAcaraDetailViewModel = viewModel(factory = factory)
     val beritaAcaraList by viewModel.beritaList.collectAsState()
 
-    Scaffold(
-        bottomBar = { BeritaBottomNavigation(navHostController) },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navHostController.navigate(Screen.BeritaFormBaru.route)
+
+    currentUser?.let { user ->
+        Scaffold(
+            bottomBar = { BeritaBottomNavigation(navHostController) },
+            floatingActionButton = {
+                if (user.role == "Gereja") {
+                    FloatingActionButton(
+                        onClick = {
+                            navHostController.navigate(Screen.BeritaFormBaru.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Tambah Berita Acara",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Tambah Berita Acara",
-                    tint = MaterialTheme.colorScheme.primary
-                )
             }
-        }
-    ) { contentPadding ->
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = contentPadding
-        ) {
-            items(beritaAcaraList) { berita ->
-                BeritaAcaraCard(beritaAcara = berita) {
-                    navHostController.navigate(Screen.BeritaFormUbah.beritaId(berita.id))
+        ) { contentPadding ->
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                contentPadding = contentPadding
+            ) {
+                items(beritaAcaraList) { berita ->
+                    BeritaAcaraCard(beritaAcara = berita) {
+                        navHostController.navigate(Screen.BeritaFormUbah.beritaId(berita.id))
+                    }
                 }
             }
         }

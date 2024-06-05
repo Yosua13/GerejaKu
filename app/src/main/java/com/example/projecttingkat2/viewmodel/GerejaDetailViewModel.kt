@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 class GerejaDetailViewModel(private val repository: GerejaRepository) : ViewModel() {
     private val _gerejaList = MutableStateFlow<List<Gereja>>(emptyList())
     val gerejaList: StateFlow<List<Gereja>> get() = _gerejaList
+    private val _gereja = MutableStateFlow<Gereja?>(null)
+    val gereja: StateFlow<Gereja?> get() = _gereja
 
     // StateFlow untuk data gereja yang sedang diedit
     private val _editedGereja = MutableStateFlow(Gereja())
@@ -65,5 +67,19 @@ class GerejaDetailViewModel(private val repository: GerejaRepository) : ViewMode
     suspend fun getGerejaById(id: String): Gereja? {
         Log.d("GerejaDetailViewModel", "Fetching gereja with id: $id")
         return repository.getGerejaById(id)
+    }
+
+    fun searchGereja(keyword: String) {
+        viewModelScope.launch {
+            _gerejaList.value = if (keyword.isNotEmpty()) {
+                // Jika ada kata kunci, filter daftar gereja sesuai dengan kata kunci
+                gerejaList.value.filter { gereja ->
+                    gereja.judul.contains(keyword, ignoreCase = true)
+                }
+            } else {
+                // Jika tidak ada kata kunci, tampilkan seluruh daftar gereja
+                repository.getGerejaList()
+            }
+        }
     }
 }

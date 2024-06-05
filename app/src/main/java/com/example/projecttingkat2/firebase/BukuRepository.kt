@@ -2,6 +2,7 @@ package com.example.projecttingkat2.firebase
 
 import android.util.Log
 import com.example.projecttingkat2.model.Buku
+import com.example.projecttingkat2.model.Gereja
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -50,5 +51,12 @@ class BukuRepository {
     suspend fun getNextId(): String {
         val document = collection.document()
         return document.id
+    }
+
+    suspend fun getBukuList(): List<Buku> {
+        val snapshot = collection.get().await()
+        return snapshot.documents.map { document ->
+            document.toObject(Buku::class.java)!!.copy(id = document.id)
+        }
     }
 }

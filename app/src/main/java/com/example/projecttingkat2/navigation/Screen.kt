@@ -3,6 +3,7 @@ package com.example.projecttingkat2.navigation
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BERITA
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BUKU
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_GEREJA
+import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_GEREJA_PENGGUNA
 
 sealed class Screen(val route: String) {
 
@@ -12,6 +13,9 @@ sealed class Screen(val route: String) {
     data object GerejaFormBaru: Screen("gerejaDetailScreen")
     data object GerejaFormUbah: Screen("gerejaDetailScreen/{$KEY_ID_GEREJA}") {
         fun gerejaId(id: String) = "gerejaDetailScreen/$id"
+    }
+    data object GerejaPengguna: Screen("gerejaPengguna/{$KEY_ID_GEREJA_PENGGUNA}") {
+        fun penggunaId(id: String) = "gerejaPengguna/$id"
     }
     data object Book: Screen("bookScreen")
     data object BukuFormBaru: Screen("bukuDetailScreen")

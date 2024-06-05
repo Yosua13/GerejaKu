@@ -82,6 +82,8 @@ import com.example.projecttingkat2.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -102,6 +104,12 @@ fun LoginRegisterScreen(navHostController: NavHostController) {
                         .fillMaxWidth()
                         .size(150.dp)
                         .clip(RoundedCornerShape(40.dp))
+                )
+                Text(
+                    text = "Selamat datang Guyss di\nGerejaKu",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(32.dp)
                 )
             }
         }
@@ -188,6 +196,7 @@ fun LoginSr(navHostController: NavHostController, viewModel: UserViewModel) {
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
             Toast.makeText(context, "Berhasil Masuk", Toast.LENGTH_SHORT).show()
+            navHostController.popBackStack()
             navHostController.navigate(Screen.Home.route)
         }
     }

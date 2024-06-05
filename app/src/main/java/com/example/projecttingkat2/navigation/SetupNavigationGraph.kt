@@ -10,12 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.projecttingkat2.MainActivity
 import com.example.projecttingkat2.model.User
 import com.example.projecttingkat2.ui.screen.BeritaAcaraScreen
 import com.example.projecttingkat2.ui.screen.BookScreen
 import com.example.projecttingkat2.ui.screen.HomeScreen
-import com.example.projecttingkat2.ui.screen.LandingPage
 import com.example.projecttingkat2.ui.screen.LoginRegisterScreen
+import com.example.projecttingkat2.ui.screen.OnboardingScreen
 import com.example.projecttingkat2.ui.screen.ProfilScreen
 import com.example.projecttingkat2.ui.screen.detail.DetailBeritaAcaraScreen
 import com.example.projecttingkat2.ui.screen.detail.DetailBukuScreen
@@ -23,16 +24,18 @@ import com.example.projecttingkat2.ui.screen.detail.DetailGerejaScreen
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BERITA
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BUKU
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_GEREJA
+import com.example.projecttingkat2.ui.screen.userscreen.GerejaPengguna
+import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_GEREJA_PENGGUNA
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SetupNavigationGraph(navHostController: NavHostController = rememberNavController()) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.LandingPage.route
+        startDestination = Screen.Home.route
     ) {
         composable(route = Screen.LandingPage.route) {
-            LandingPage(navHostController)
+            OnboardingScreen(navHostController)
         }
 
         composable(route = Screen.LoginRegister.route) {
@@ -53,6 +56,15 @@ fun SetupNavigationGraph(navHostController: NavHostController = rememberNavContr
         ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString(KEY_ID_GEREJA)
             DetailGerejaScreen(navHostController, id)
+        }
+        composable(
+            route = Screen.GerejaPengguna.route,
+            arguments = listOf(
+                navArgument(KEY_ID_GEREJA_PENGGUNA) { type = NavType.StringType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString(KEY_ID_GEREJA_PENGGUNA)
+            GerejaPengguna(navHostController, viewModel(), id)
         }
 
         composable(route = Screen.Book.route) {
