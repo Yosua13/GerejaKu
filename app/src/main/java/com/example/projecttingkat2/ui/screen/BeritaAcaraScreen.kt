@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +57,7 @@ import com.example.projecttingkat2.viewmodel.UserViewModel
 @Composable
 fun BeritaAcaraScreen(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val userViewModel: UserViewModel = viewModel()
     val currentUser by userViewModel.currentUser.collectAsState()
@@ -92,7 +93,11 @@ fun BeritaAcaraScreen(
             ) {
                 items(beritaAcaraList) { berita ->
                     BeritaAcaraCard(beritaAcara = berita) {
-                        navHostController.navigate(Screen.BeritaFormUbah.beritaId(berita.id))
+                        if (user.role == "Gereja") {
+                            navHostController.navigate(Screen.BeritaFormUbah.beritaId(berita.id))
+                        } else if (user.role == "Pengguna") {
+                            navHostController.navigate(Screen.BeritaPengguna.beritaPenggunaId(berita.id))
+                        }
                     }
                 }
             }
@@ -105,8 +110,10 @@ private fun BeritaBottomNavigation(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val selectedColor = Color(0xFFEA5DFF)
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier.shadow(elevation = 4.dp)
     ) {
         NavigationBarItem(
@@ -117,12 +124,20 @@ private fun BeritaBottomNavigation(
                 )
             },
             label = {
-                Text(stringResource(R.string.utama))
+                Text(
+                    text = stringResource(R.string.utama)
+                )
             },
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Home.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -137,7 +152,13 @@ private fun BeritaBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Book.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -152,7 +173,13 @@ private fun BeritaBottomNavigation(
             selected = true,
             onClick = {
                 navHostController.navigate(Screen.BeritaAcara.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -167,7 +194,13 @@ private fun BeritaBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Profil.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
     }
 }

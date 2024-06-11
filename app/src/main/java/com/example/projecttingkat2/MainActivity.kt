@@ -10,7 +10,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.projecttingkat2.model.Gereja
 import com.example.projecttingkat2.navigation.SetupNavigationGraph
+import com.example.projecttingkat2.ui.screen.ChatAIScreen
+import com.example.projecttingkat2.ui.screen.userscreen.GerejaPengguna
 import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 
 class MainActivity : ComponentActivity() {

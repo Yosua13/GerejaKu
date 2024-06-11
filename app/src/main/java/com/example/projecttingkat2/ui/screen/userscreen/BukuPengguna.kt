@@ -70,37 +70,36 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.projecttingkat2.R
-import com.example.projecttingkat2.firebase.PenggunaGerejaRepository
-import com.example.projecttingkat2.model.Gereja
-import com.example.projecttingkat2.viewmodel.PenggunaGerejaViewModel
-import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
-import com.example.projecttingkat2.util.PenggunaGerejaViewModelFactory
+import com.example.projecttingkat2.firebase.PenggunaBukuRepository
+import com.example.projecttingkat2.model.Buku
+import com.example.projecttingkat2.util.PenggunaBukuViewModelFactory
+import com.example.projecttingkat2.viewmodel.PenggunaBukuViewModel
 import com.example.projecttingkat2.viewmodel.UserViewModel
 
-const val KEY_ID_GEREJA_PENGGUNA = "idGerejaPengguna"
+const val KEY_ID_BUKU_PENGGUNA = "idBukuPengguna"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GerejaPengguna(
+fun BukuPengguna(
     navHostController: NavHostController,
     id: String? = null,
 ) {
 
-    val repository = PenggunaGerejaRepository()
-    val factory = PenggunaGerejaViewModelFactory(repository)
-    val viewModel: PenggunaGerejaViewModel = viewModel(factory = factory)
-    val gereja by viewModel.gereja.collectAsState()
+    val repository = PenggunaBukuRepository()
+    val factory = PenggunaBukuViewModelFactory(repository)
+    val viewModel: PenggunaBukuViewModel = viewModel(factory = factory)
+    val buku by viewModel.buku.collectAsState()
 
     LaunchedEffect(id) {
         try {
             if (id != null) {
-                Log.d("GerejaPengguna", "LaunchedEffect triggered with ID: $id")
-                viewModel.getGerejaById(id)
+                Log.d("BukuPengguna", "LaunchedEffect triggered with ID: $id")
+                viewModel.getBukuById(id)
             } else {
-                Log.d("GerejaPengguna", "No Gereja ID provided, current Gereja ID: ${gereja?.id}")
+                Log.d("BukuPengguna", "No Buku ID provided, current buku ID: ${buku?.id}")
             }
         } catch (e: Exception) {
-            Log.e("GerejaPengguna", "Error in LaunchedEffect: ${e.message}", e)
+            Log.e("BukuPengguna", "Error in LaunchedEffect: ${e.message}", e)
         }
     }
 
@@ -126,9 +125,9 @@ fun GerejaPengguna(
         },
         containerColor = Color.Transparent,
         content = { paddingValues ->
-            gereja?.let {
-                Log.d("GerejaPengguna", "Displaying Gereja: ${it.judul}")
-                Pengguna(gereja = it, paddingValues = paddingValues)
+            buku?.let {
+                Log.d("BukuPengguna", "Displaying Buku: ${it.judul}")
+                PenggunaBuku(buku = it, paddingValues = paddingValues)
             } ?: Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -143,8 +142,8 @@ fun GerejaPengguna(
 }
 
 @Composable
-fun Pengguna(
-    gereja: Gereja,
+fun PenggunaBuku(
+    buku: Buku,
     paddingValues: PaddingValues,
 ) {
     Box(
@@ -152,8 +151,8 @@ fun Pengguna(
             .fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
-        BackGroundPoster(gereja)
-        ForegroundPoster(gereja)
+        BackGroundPosterBuku(buku)
+        ForegroundPosterBuku(buku)
         Column(
             Modifier
                 .padding(start = 20.dp, end = 20.dp, bottom = 50.dp)
@@ -162,18 +161,18 @@ fun Pengguna(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = gereja.judul,
+                text = buku.judul,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 38.sp,
                 color = Color.White,
                 lineHeight = 40.sp,
                 textAlign = TextAlign.Center
             )
-            Rating(gereja, modifier = Modifier)
-            TextBuilder(
+            RatingBuku(buku, modifier = Modifier)
+            TextBuilderBuku(
                 icon = Icons.Filled.Info,
-                title = "Latarbelakang Gereja:",
-                bodyText = gereja.deskripsi
+                title = "Sinopsis Buku:",
+                bodyText = buku.sinopsis
             )
         }
     }
@@ -181,7 +180,7 @@ fun Pengguna(
 
 
 @Composable
-fun TextBuilder(icon: ImageVector, title: String, bodyText: String) {
+fun TextBuilderBuku(icon: ImageVector, title: String, bodyText: String) {
     Row {
         Icon(
             imageVector = icon,
@@ -209,7 +208,7 @@ fun TextBuilder(icon: ImageVector, title: String, bodyText: String) {
 }
 
 @Composable
-fun Rating(gereja: Gereja, modifier: Modifier = Modifier) {
+fun RatingBuku(buku: Buku, modifier: Modifier = Modifier) {
     val context = LocalContext.current
 
     Column(
@@ -218,52 +217,18 @@ fun Rating(gereja: Gereja, modifier: Modifier = Modifier) {
         Row {
             Icon(imageVector = Icons.Filled.Star, contentDescription = "", tint = Color.White)
             Text(
-                text = gereja.aliran,
+                text = buku.penulis,
                 modifier.padding(start = 6.dp),
                 color = Color.White
             )
         }
         Spacer(modifier = Modifier.width(25.dp))
-        Row {
-            Icon(
-                imageVector = Icons.Filled.PinDrop,
-                contentDescription = "",
-                tint = Color.White
-            )
-            Text(
-                text = gereja.lokasi,
-                modifier.padding(start = 6.dp),
-                color = Color.White
-            )
-        }
-        Spacer(modifier = Modifier.width(25.dp))
-        Row {
-            Icon(imageVector = Icons.Filled.DateRange, contentDescription = "", tint = Color.White)
-            Text(
-                text = gereja.jadwal,
-                modifier.padding(start = 6.dp),
-                color = Color.White
-            )
-        }
-        Spacer(modifier = Modifier.width(25.dp))
-        Row {
-            Icon(imageVector = Icons.Filled.Link, contentDescription = "", tint = Color.White)
-            ClickableText(
-                text = AnnotatedString(gereja.link),
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(gereja.link))
-                    context.startActivity(intent)
-                },
-                style = TextStyle(color = Color.White, textDecoration = TextDecoration.Underline),
-                modifier = modifier.padding(start = 6.dp)
-            )
-        }
     }
 }
 
 
 @Composable
-fun ForegroundPoster(gereja: Gereja) {
+fun ForegroundPosterBuku(buku: Buku) {
 
     Box(
         modifier = Modifier
@@ -274,7 +239,7 @@ fun ForegroundPoster(gereja: Gereja) {
         contentAlignment = Alignment.TopCenter
     ) {
         AsyncImage(
-            model = gereja.gambar, contentDescription = gereja.judul,
+            model = buku.gambar, contentDescription = buku.judul,
             Modifier
                 .width(250.dp)
                 .clip(RoundedCornerShape(16.dp))
@@ -297,14 +262,14 @@ fun ForegroundPoster(gereja: Gereja) {
 }
 
 @Composable
-fun BackGroundPoster(gereja: Gereja) {
+fun BackGroundPosterBuku(buku: Buku) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.DarkGray)
     ) {
         AsyncImage(
-            model = gereja.gambar, contentDescription = gereja.judul,
+            model = buku.gambar, contentDescription = buku.judul,
             modifier = Modifier
                 .fillMaxWidth()
                 .alpha(0.6f)

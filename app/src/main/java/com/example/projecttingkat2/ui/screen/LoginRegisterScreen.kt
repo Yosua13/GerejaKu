@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -81,7 +83,9 @@ import com.example.projecttingkat2.ui.theme.ProjectTingkat2Theme
 import com.example.projecttingkat2.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -98,25 +102,32 @@ fun LoginRegisterScreen(navHostController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(R.drawable.logogerejaku),
+                    painter = painterResource(R.drawable.top_background),
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(150.dp)
-                        .clip(RoundedCornerShape(40.dp))
+                    contentScale = ContentScale.FillBounds
                 )
                 Text(
-                    text = "Selamat datang Guyss di\nGerejaKu",
-                    fontSize = 28.sp,
+                    text = "Selamat Datang di GerejaKu",
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(32.dp)
+                    fontStyle = FontStyle.Italic,
+                    color = Color(android.graphics.Color.parseColor("#7d32a8"))
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+        },
+        bottomBar = {
+            Column(modifier = Modifier.background(Color.White)) {
+                Image(
+                    painter = painterResource(R.drawable.bottom_background),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds
                 )
             }
         }
     ) { contentPadding ->
         Card(
             modifier = Modifier
-                .padding(start = 28.dp, end = 28.dp, bottom = 80.dp)
                 .background(Color.White)
         ) {
             Column(
@@ -163,13 +174,20 @@ fun LoginRegisterScreen(navHostController: NavHostController) {
                     userScrollEnabled = false
                 ) { page ->
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                            .padding(start = 28.dp, end = 28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         when (page) {
                             0 -> LoginSr(navHostController, viewModel())
-                            1 -> RegisterSr(viewModel())
+                            1 -> RegisterSr(viewModel(), onRegisterSuccess = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(0)
+                                }
+                            })
                         }
                     }
                 }
@@ -214,7 +232,8 @@ fun LoginSr(navHostController: NavHostController, viewModel: UserViewModel) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxSize()
+                .fillMaxWidth()
+                .fillMaxHeight()
         ) {
             OutlinedTextField(
                 value = email,
@@ -273,7 +292,13 @@ fun LoginSr(navHostController: NavHostController, viewModel: UserViewModel) {
                         viewModel.loginUser(email, password)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(66.dp)
+                    .padding(top = 8.dp, bottom = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(android.graphics.Color.parseColor("#7d32a8"))),
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Text("Masuk")
             }
@@ -284,7 +309,7 @@ fun LoginSr(navHostController: NavHostController, viewModel: UserViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RegisterSr(viewModel: UserViewModel) {
+fun RegisterSr(viewModel: UserViewModel, onRegisterSuccess: () -> Unit) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -362,7 +387,7 @@ fun RegisterSr(viewModel: UserViewModel) {
             )
             if (firstNameError) {
                 Text(
-                    text = "Nama Depan tidak boleh kosong",
+                    text = "Nama Depan tidak boleh kosong atau lebih dari 25 karakter",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -382,7 +407,7 @@ fun RegisterSr(viewModel: UserViewModel) {
             )
             if (lastNameError) {
                 Text(
-                    text = "Nama Belakang tidak boleh kosong",
+                    text = "Nama Belakang tidak boleh kosong atau lebih dari 10 karakter",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -402,7 +427,7 @@ fun RegisterSr(viewModel: UserViewModel) {
             )
             if (emailError) {
                 Text(
-                    text = "Alamat Surel tidak boleh kosong",
+                    text = "Alamat Surel tidak boleh kosong, menggunakan simbol kecuali @, atau lebih dari 30 karakter",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -437,7 +462,7 @@ fun RegisterSr(viewModel: UserViewModel) {
             )
             if (passwordError) {
                 Text(
-                    text = "Kata Sandi tidak boleh kosong",
+                    text = "Kata Sandi harus antara 6 dan 15 karakter",
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -495,7 +520,10 @@ fun RegisterSr(viewModel: UserViewModel) {
                 shape = CircleShape
             )
             if (noHPError) {
-                Text(text = "Nomor HP tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = "Nomor HP harus angka dan tidak lebih dari 13 karakter",
+                    color = MaterialTheme.colorScheme.error
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -557,12 +585,12 @@ fun RegisterSr(viewModel: UserViewModel) {
 
             Button(
                 onClick = {
-                    firstNameError = firstName.isEmpty()
-                    lastNameError = lastName.isEmpty()
-                    emailError = email.isEmpty()
-                    passwordError = password.isEmpty()
-                    confirmPasswordError = confirmPassword.isEmpty()
-                    noHPError = noHP.isEmpty()
+                    firstNameError = firstName.isEmpty() || firstName.length > 25 || firstName.length <= 3
+                    lastNameError = lastName.isEmpty() || lastName.length > 10 || lastName.length <= 3
+                    emailError = email.isEmpty() || email.length > 30 || email.any { !it.isLetterOrDigit() && it != '@' && it == '_' && it == '.' }
+                    passwordError = password.isEmpty() || password.length < 6 || password.length > 15
+                    confirmPasswordError = confirmPassword.isEmpty() || confirmPassword != password
+                    noHPError = noHP.isEmpty() || noHP.length > 13 || noHP.any { !it.isDigit() }
                     tanggalError = tanggal.isEmpty()
                     roleError = role.isEmpty()
 
@@ -575,9 +603,16 @@ fun RegisterSr(viewModel: UserViewModel) {
 
                     if (!firstNameError && !lastNameError && !emailError && !passwordError && !confirmPasswordError && !noHPError && !tanggalError && !roleError) {
                         viewModel.registerUser(user)
+                        onRegisterSuccess()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(66.dp)
+                    .padding(top = 8.dp, bottom = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(android.graphics.Color.parseColor("#7d32a8"))),
+                shape = RoundedCornerShape(50.dp)
             ) {
                 Text("Daftar")
             }

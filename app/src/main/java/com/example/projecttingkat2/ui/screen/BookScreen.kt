@@ -28,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -112,7 +113,11 @@ fun BookScreen(navHostController: NavHostController) {
                     BookCard(
                         buku = buku
                     ) {
-                        navHostController.navigate(Screen.BukuFormUbah.bukuId(buku.id))
+                        if (user.role == "Gereja") {
+                            navHostController.navigate(Screen.BukuFormUbah.bukuId(buku.id))
+                        } else if (user.role == "Pengguna") {
+                            navHostController.navigate(Screen.BukuPengguna.bukuPenggunaId(buku.id))
+                        }
                     }
                 }
             }
@@ -125,8 +130,10 @@ private fun BookBottomNavigation(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val selectedColor = Color(0xFFEA5DFF)
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier.shadow(elevation = 4.dp)
     ) {
         NavigationBarItem(
@@ -137,12 +144,20 @@ private fun BookBottomNavigation(
                 )
             },
             label = {
-                Text(stringResource(R.string.utama))
+                Text(
+                    text = stringResource(R.string.utama)
+                )
             },
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Home.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -157,7 +172,13 @@ private fun BookBottomNavigation(
             selected = true,
             onClick = {
                 navHostController.navigate(Screen.Book.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -172,7 +193,13 @@ private fun BookBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.BeritaAcara.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -187,7 +214,13 @@ private fun BookBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Profil.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
     }
 }

@@ -14,6 +14,7 @@ import com.example.projecttingkat2.MainActivity
 import com.example.projecttingkat2.model.User
 import com.example.projecttingkat2.ui.screen.BeritaAcaraScreen
 import com.example.projecttingkat2.ui.screen.BookScreen
+import com.example.projecttingkat2.ui.screen.ChatAIScreen
 import com.example.projecttingkat2.ui.screen.HomeScreen
 import com.example.projecttingkat2.ui.screen.LoginRegisterScreen
 import com.example.projecttingkat2.ui.screen.OnboardingScreen
@@ -24,7 +25,11 @@ import com.example.projecttingkat2.ui.screen.detail.DetailGerejaScreen
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BERITA
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_BUKU
 import com.example.projecttingkat2.ui.screen.detail.KEY_ID_GEREJA
+import com.example.projecttingkat2.ui.screen.userscreen.BeritaPengguna
+import com.example.projecttingkat2.ui.screen.userscreen.BukuPengguna
 import com.example.projecttingkat2.ui.screen.userscreen.GerejaPengguna
+import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_BERITA_PENGGUNA
+import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_BUKU_PENGGUNA
 import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_GEREJA_PENGGUNA
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -32,7 +37,7 @@ import com.example.projecttingkat2.ui.screen.userscreen.KEY_ID_GEREJA_PENGGUNA
 fun SetupNavigationGraph(navHostController: NavHostController = rememberNavController()) {
     NavHost(
         navController = navHostController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.LoginRegister.route
     ) {
         composable(route = Screen.LandingPage.route) {
             OnboardingScreen(navHostController)
@@ -64,7 +69,7 @@ fun SetupNavigationGraph(navHostController: NavHostController = rememberNavContr
             )
         ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getString(KEY_ID_GEREJA_PENGGUNA)
-            GerejaPengguna(navHostController, viewModel(), id)
+            GerejaPengguna(navHostController, id)
         }
 
         composable(route = Screen.Book.route) {
@@ -82,6 +87,15 @@ fun SetupNavigationGraph(navHostController: NavHostController = rememberNavContr
             val id = navBackStackEntry.arguments?.getString(KEY_ID_BUKU)
             DetailBukuScreen(navHostController, id)
         }
+        composable(
+            route = Screen.BukuPengguna.route,
+            arguments = listOf(
+                navArgument(KEY_ID_BUKU_PENGGUNA) { type = NavType.StringType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString(KEY_ID_BUKU_PENGGUNA)
+            BukuPengguna(navHostController, id)
+        }
         composable(route = Screen.BeritaAcara.route) {
             BeritaAcaraScreen(navHostController)
         }
@@ -97,8 +111,20 @@ fun SetupNavigationGraph(navHostController: NavHostController = rememberNavContr
             val id = navBackStackEntry.arguments?.getString(KEY_ID_BERITA)
             DetailBeritaAcaraScreen(navHostController, id)
         }
+        composable(
+            route = Screen.BeritaPengguna.route,
+            arguments = listOf(
+                navArgument(KEY_ID_BERITA_PENGGUNA) { type = NavType.StringType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getString(KEY_ID_BERITA_PENGGUNA)
+            BeritaPengguna(navHostController, id)
+        }
         composable(route = Screen.Profil.route) {
             ProfilScreen(navHostController)
+        }
+        composable(route = Screen.ChatAI.route) {
+            ChatAIScreen(navHostController)
         }
     }
 }

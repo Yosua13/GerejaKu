@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Church
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Search
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -83,7 +85,6 @@ fun HomeScreen(
     var searchText by remember { mutableStateOf("") }
 
     currentUser?.let { user ->
-
         Scaffold(
             topBar = {
                 TopApp(
@@ -105,6 +106,18 @@ fun HomeScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                } else if (user.role == "Pengguna") {
+                    FloatingActionButton(
+                        onClick = {
+                            navHostController.navigate(Screen.ChatAI.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ChatBubble,
+                            contentDescription = "Chat AI",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
@@ -116,7 +129,7 @@ fun HomeScreen(
                     GerejaCard(gereja = gereja) {
                         if (user.role == "Gereja") {
                             navHostController.navigate(Screen.GerejaFormUbah.gerejaId(gereja.id))
-                        } else {
+                        } else if (user.role == "Pengguna") {
                             navHostController.navigate(Screen.GerejaPengguna.penggunaId(gereja.id))
                         }
                     }
@@ -131,24 +144,36 @@ private fun HomeBottomNavigation(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val selectedColor = Color(0xFFEA5DFF)
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier.shadow(elevation = 4.dp)
     ) {
         NavigationBarItem(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Church,
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = selectedColor
                 )
             },
             label = {
-                Text(stringResource(R.string.utama))
+                Text(
+                    text = stringResource(R.string.utama),
+                    color = selectedColor
+                )
             },
             selected = true,
             onClick = {
                 navHostController.navigate(Screen.Home.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -163,7 +188,13 @@ private fun HomeBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Book.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -178,7 +209,13 @@ private fun HomeBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.BeritaAcara.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
         NavigationBarItem(
             icon = {
@@ -193,10 +230,18 @@ private fun HomeBottomNavigation(
             selected = false,
             onClick = {
                 navHostController.navigate(Screen.Profil.route)
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor
+            )
         )
     }
 }
+
+
 
 @Composable
 fun GerejaCard(
