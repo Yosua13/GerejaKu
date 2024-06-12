@@ -1,6 +1,7 @@
 package com.example.projecttingkat2.viewmodel
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projecttingkat2.firebase.UserRepository
@@ -143,7 +144,6 @@ class UserViewModel : ViewModel() {
     fun logout() {
         // Hapus informasi pengguna dari state
         _currentUser.value = null
-        // Tambahkan logika tambahan jika perlu, misalnya menghapus token dari penyimpanan
     }
 
     private fun saveUserToFirestore(user: User) {

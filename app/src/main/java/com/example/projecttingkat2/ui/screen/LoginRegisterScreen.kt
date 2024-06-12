@@ -1,6 +1,9 @@
 package com.example.projecttingkat2.ui.screen
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Build
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -26,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Visibility
@@ -53,6 +57,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,6 +94,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
@@ -349,6 +361,27 @@ fun RegisterSr(viewModel: UserViewModel, onRegisterSuccess: () -> Unit) {
     val registrationSuccess by viewModel.registrationSuccess.collectAsState()
     val registrationError by viewModel.registrationError.collectAsState()
 
+    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val dateDialogState = rememberMaterialDialogState()
+
+    val year: Int
+    val month: Int
+    val day: Int
+
+    val calendar = Calendar.getInstance()
+    year = calendar.get(Calendar.YEAR)
+    month = calendar.get(Calendar.MONTH)
+    day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+            val selectedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+            tanggal = selectedDate
+        }, year, month, day
+    )
+
     LaunchedEffect(registrationSuccess) {
         if (registrationSuccess) {
             Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
@@ -416,7 +449,7 @@ fun RegisterSr(viewModel: UserViewModel, onRegisterSuccess: () -> Unit) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Alamat Surel") },
+                label = { Text(text = "Alamat Email") },
                 singleLine = true,
                 isError = emailError,
                 modifier = Modifier
@@ -530,27 +563,51 @@ fun RegisterSr(viewModel: UserViewModel, onRegisterSuccess: () -> Unit) {
             OutlinedTextField(
                 value = tanggal,
                 onValueChange = { tanggal = it },
-                label = { Text(text = "Tanggal Lahir") },
+                readOnly = true,
                 singleLine = true,
                 isError = tanggalError,
+                label = { Text("Jadwal Ibadah Gereja") },
+                trailingIcon = {
+                    IconButton(onClick = { datePickerDialog.show() }) {
+                        Icon(imageVector = Icons.Default.CalendarToday, contentDescription = "Pilih Tanggal")
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                shape = CircleShape,
+                shape = CircleShape
             )
             if (tanggalError) {
                 Text(
                     text = "Tanggal Lahir tidak boleh kosong", color = MaterialTheme.colorScheme.error
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            // Dialog untuk pemilih tanggal
+            MaterialDialog(
+                dialogState = dateDialogState,
+                buttons = {
+                    positiveButton(text = "OK") {
+                        dateDialogState.hide()
+                    }
+                    negativeButton(text = "Batal") {
+                        dateDialogState.hide()
+                    }
+                }
+            ) {
+                datepicker(
+                    initialDate = pickedDate,
+                    onDateChange = { pickedDate = it }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
             ) {
-                TextField(
+                OutlinedTextField(
                     value = role,
                     onValueChange = { role = it },
                     readOnly = true,

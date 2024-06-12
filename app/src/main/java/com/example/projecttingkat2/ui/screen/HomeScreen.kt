@@ -14,13 +14,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -257,7 +262,7 @@ fun GerejaCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 28.dp, end = 28.dp, top = 28.dp)
+            .padding(start = 28.dp, end = 28.dp, top = 8.dp, bottom = 8.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(Color(0xFFFFFFFF)),
@@ -275,20 +280,43 @@ fun GerejaCard(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
             )
-            Row(
+            Column(
                 modifier = Modifier
                     .padding(start = 16.dp, bottom = 8.dp)
             ) {
-                Column {
-                    Text(
-                        text = gereja.judul,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold
+                Text(
+                    text = gereja.judul,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Pembicara"
                     )
                     Text(
                         text = gereja.aliran,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.PinDrop,
+                        contentDescription = "Lokasi"
+                    )
+                    Text(
+                        text = gereja.lokasi,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.CalendarMonth,
+                        contentDescription = "Kalender"
+                    )
+                    Text(
+                        text = gereja.jadwal,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 10.dp)
                     )
                 }
             }
@@ -300,10 +328,10 @@ fun GerejaCard(
 fun TopApp(
     searchText: String,
     onSearchTextChanged: (String) -> Unit,
-    onSearch: (String) -> Unit, // Tambahkan parameter untuk fungsi pencarian
+    onSearch: (String) -> Unit,
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        Box() {
+        Box {
             Image(
                 painter = painterResource(R.drawable.merpati),
                 contentDescription = "Andes Mountain",
@@ -317,25 +345,25 @@ fun TopApp(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 150.dp, top = 70.dp),
+                .padding(end = 150.dp, top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Praise",
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 fontSize = 24.sp
             )
             Text(
                 text = "The Lord,",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 4.dp),
                 fontSize = 24.sp
             )
             Text(
                 text = "Home",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 4.dp),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -343,7 +371,7 @@ fun TopApp(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 182.dp)
+                .padding(top = 120.dp)
         ) {
             // Field pencarian dengan label dan ikon search
             OutlinedTextField(
@@ -351,10 +379,10 @@ fun TopApp(
                 onValueChange = onSearchTextChanged,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(start = 24.dp, end = 24.dp, top = 14.dp, bottom = 8.dp),
                 label = { Text("Search", fontSize = 18.sp) },
                 trailingIcon = {
-                    IconButton(onClick = { onSearch(searchText) }) { // Panggil fungsi pencarian saat tombol pencarian ditekan
+                    IconButton(onClick = { onSearch(searchText) }) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search Icon",

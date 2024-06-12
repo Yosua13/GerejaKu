@@ -173,7 +173,7 @@ fun PenggunaBerita(
                 textAlign = TextAlign.Center
             )
             RatingBerita(beritaAcara, modifier = Modifier)
-            TextBuilderBuku(
+            TextBuilderBerita(
                 icon = Icons.Filled.Info,
                 title = "Info Selengkapnya:",
                 bodyText = beritaAcara.deskripsi
@@ -213,7 +213,6 @@ fun TextBuilderBerita(icon: ImageVector, title: String, bodyText: String) {
 
 @Composable
 fun RatingBerita(beritaAcara: BeritaAcara, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
 
     Column(
         modifier.fillMaxWidth(),

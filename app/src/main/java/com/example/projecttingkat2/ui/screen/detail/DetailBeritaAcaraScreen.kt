@@ -1,10 +1,13 @@
 package com.example.projecttingkat2.ui.screen.detail
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,14 +29,19 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AvTimer
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,6 +91,7 @@ import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.UUID
 import kotlin.math.sin
 
@@ -100,13 +109,17 @@ fun DetailBeritaAcaraScreen(
     val factory = BeritaAcaraViewModelFactory(repository)
     val viewModel: BeritaAcaraDetailViewModel = viewModel(factory = factory)
 
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+    val pickedDate by remember { mutableStateOf(LocalDate.now()) }
+    val pickedTime by remember { mutableStateOf(LocalTime.NOON) }
 
     var judul by rememberSaveable { mutableStateOf("") }
     var namaGereja by rememberSaveable { mutableStateOf("") }
     var pembicara by rememberSaveable { mutableStateOf("") }
     var jadwalIbadah by remember {
         mutableStateOf(DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate))
+    }
+    var jamIbadah by remember {
+        mutableStateOf(DateTimeFormatter.ofPattern("HH:mm").format(pickedTime))
     }
     var deskripsi by rememberSaveable { mutableStateOf("") }
     var gambarBerita by rememberSaveable { mutableStateOf("") }
@@ -115,6 +128,7 @@ fun DetailBeritaAcaraScreen(
     var namaGerejaError by rememberSaveable { mutableStateOf(false) }
     var pembicaraError by rememberSaveable { mutableStateOf(false) }
     var jadwalIbadahError by rememberSaveable { mutableStateOf(false) }
+    var jamIbadahError by rememberSaveable { mutableStateOf(false) }
     var deskripsiError by rememberSaveable { mutableStateOf(false) }
     var gambarBeritaError by rememberSaveable { mutableStateOf(false) }
 
@@ -129,6 +143,7 @@ fun DetailBeritaAcaraScreen(
             namaGereja = it.namaGereja
             pembicara = it.pembicara
             jadwalIbadah = it.jadwalIbadah
+            jamIbadah = it.jamIbadah
             deskripsi = it.deskripsi
             gambarBerita = it.gambarBerita
         }
@@ -148,9 +163,9 @@ fun DetailBeritaAcaraScreen(
                 },
                 title = {
                     if (id == null)
-                        Text(text = "Tambahkan Gereja")
+                        Text(text = "Tambahkan Berita Acara")
                     else
-                        Text(text = "Ubah Gereja")
+                        Text(text = "Ubah Berita Acara")
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -162,13 +177,14 @@ fun DetailBeritaAcaraScreen(
                         namaGerejaError = namaGereja.isEmpty()
                         pembicaraError = pembicara.isEmpty()
                         jadwalIbadahError = jadwalIbadah.isEmpty()
+                        jamIbadahError = jamIbadah.isEmpty()
                         deskripsiError = deskripsi.isEmpty()
                         gambarBeritaError = gambarBerita.isEmpty()
-                        if (judulError || namaGerejaError || jadwalIbadahError || jadwalIbadahError || deskripsiError || gambarBeritaError) {
+                        if (judulError || namaGerejaError || jadwalIbadahError || jamIbadahError || deskripsiError || gambarBeritaError) {
                             return@IconButton
                         }
                         if (id == null) {
-                            viewModel.insert(judul, namaGereja, pembicara, jadwalIbadah, deskripsi, gambarBerita)
+                            viewModel.insert(judul, namaGereja, pembicara, jadwalIbadah, jamIbadah, deskripsi, gambarBerita)
                             Toast.makeText(context, "Data berhasil dimasukkan", Toast.LENGTH_SHORT).show()
                         } else {
                             viewModel.update(
@@ -177,6 +193,7 @@ fun DetailBeritaAcaraScreen(
                                 namaGereja,
                                 pembicara,
                                 jadwalIbadah,
+                                jamIbadah,
                                 deskripsi,
                                 gambarBerita
                             )
@@ -210,6 +227,8 @@ fun DetailBeritaAcaraScreen(
             onPembicaraChange = { pembicara = it },
             jadwalIbadah = jadwalIbadah,
             onJadwalIbadahChange = { jadwalIbadah = it },
+            jam = jamIbadah,
+            onJamChange = { jamIbadah = it },
             deskripsi = deskripsi,
             onDeskripsiChange = { deskripsi = it },
             gambarBerita = gambarBerita,
@@ -218,6 +237,7 @@ fun DetailBeritaAcaraScreen(
             namaGerejaError = namaGerejaError,
             pembicaraError = pembicaraError,
             jadwalIbadahError = jadwalIbadahError,
+            jamError = jamIbadahError,
             deskripsiError = deskripsiError,
             gambarBeritaError = gambarBeritaError,
             bitmap = bitmap,
@@ -229,6 +249,7 @@ fun DetailBeritaAcaraScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DetailBeritaAcaraCard(
@@ -240,6 +261,8 @@ fun DetailBeritaAcaraCard(
     onPembicaraChange: (String) -> Unit,
     jadwalIbadah: String,
     onJadwalIbadahChange: (String) -> Unit,
+    jam: String,
+    onJamChange: (String) -> Unit,
     deskripsi: String,
     onDeskripsiChange: (String) -> Unit,
     gambarBerita: String,
@@ -248,6 +271,7 @@ fun DetailBeritaAcaraCard(
     namaGerejaError: Boolean,
     pembicaraError: Boolean,
     jadwalIbadahError: Boolean,
+    jamError: Boolean,
     deskripsiError: Boolean,
     gambarBeritaError: Boolean,
     bitmap: MutableState<Bitmap?>,
@@ -259,26 +283,44 @@ fun DetailBeritaAcaraCard(
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     var pickedTime by remember { mutableStateOf(LocalTime.now()) }
 
-    val formattedDate by remember {
-        derivedStateOf {
-            DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate)
-        }
-    }
-
-    val formattedTime by remember {
-        derivedStateOf {
-            DateTimeFormatter.ofPattern("HH:mm").format(pickedTime)
-        }
-    }
-
-    val formattedDateTime = "$formattedDate $formattedTime"
-
     val dateDialogState = rememberMaterialDialogState()
     val timeDialogState = rememberMaterialDialogState()
 
-    LaunchedEffect(pickedDate, pickedTime) {
-        onJadwalIbadahChange(formattedDateTime)
-    }
+    val year: Int
+    val month: Int
+    val day: Int
+
+    val calendar = Calendar.getInstance()
+    year = calendar.get(Calendar.YEAR)
+    month = calendar.get(Calendar.MONTH)
+    day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+            val selectedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+            onJadwalIbadahChange(selectedDate)
+        }, year, month, day
+    )
+
+    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    val currentMinute = calendar.get(Calendar.MINUTE)
+
+    val timePickerDialog = TimePickerDialog(
+        context,
+        { _, hourOfDay, minute ->
+            val selectedTime = String.format("%02d:%02d", hourOfDay, minute)
+            onJamChange(selectedTime)
+        }, currentHour, currentMinute, true
+    )
+    var expanded by remember { mutableStateOf(false) }
+
+
+    val repositoryGereja = GerejaRepository()
+    val factoryGereja = GerejaViewModelFactory(repositoryGereja)
+    val gerejaViewModel: GerejaDetailViewModel = viewModel(factory = factoryGereja)
+    val gereja by gerejaViewModel.gerejaList.collectAsState()
+
 
     Column(
         modifier = Modifier
@@ -307,6 +349,12 @@ fun DetailBeritaAcaraCard(
             value = namaGereja,
             onValueChange = { onNamaGerejaChange(it) },
             label = { Text(text = "Nama Gereja") },
+            trailingIcon = {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Pilih Gereja")
+                }
+            },
+            readOnly = true,
             singleLine = true,
             isError = namaGerejaError,
             modifier = Modifier
@@ -317,6 +365,25 @@ fun DetailBeritaAcaraCard(
         )
         if (namaGerejaError) {
             Text(text = "Nama Gereja tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            gereja.forEach { gereja ->
+                DropdownMenuItem(
+                    text = { Text(text = gereja.judul) },
+                    onClick = {
+                        onNamaGerejaChange(gereja.judul)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
         }
 
         OutlinedTextField(
@@ -336,14 +403,14 @@ fun DetailBeritaAcaraCard(
         }
 
         OutlinedTextField(
-            value = formattedDateTime,
+            value = jadwalIbadah,
             onValueChange = { onJadwalIbadahChange(it) },
             readOnly = true,
             singleLine = true,
             isError = jadwalIbadahError,
             label = { Text("Jadwal Ibadah Gereja") },
             trailingIcon = {
-                IconButton(onClick = { dateDialogState.show() }) {
+                IconButton(onClick = { datePickerDialog.show() }) {
                     Icon(imageVector = Icons.Default.CalendarToday, contentDescription = "Pilih Tanggal")
                 }
             },
@@ -363,7 +430,6 @@ fun DetailBeritaAcaraCard(
             buttons = {
                 positiveButton(text = "OK") {
                     dateDialogState.hide()
-                    timeDialogState.show()
                 }
                 negativeButton(text = "Batal") {
                     dateDialogState.hide()
@@ -374,6 +440,28 @@ fun DetailBeritaAcaraCard(
                 initialDate = pickedDate,
                 onDateChange = { pickedDate = it }
             )
+        }
+
+        OutlinedTextField(
+            value = jam,
+            onValueChange = { onJamChange(it) },
+            readOnly = true,
+            singleLine = true,
+            isError = jadwalIbadahError,
+            label = { Text("Jam Ibadah Gereja") },
+            trailingIcon = {
+                IconButton(onClick = { timePickerDialog.show() }) {
+                    Icon(imageVector = Icons.Default.AccessTime, contentDescription = "Pilih Jam")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
+        )
+        if (jamError) {
+            Text(text = "Jam Ibadah Gereja tidak boleh kosong", color = MaterialTheme.colorScheme.error)
         }
 
         // Dialog untuk pemilih jam
@@ -397,7 +485,7 @@ fun DetailBeritaAcaraCard(
         OutlinedTextField(
             value = deskripsi,
             onValueChange = { onDeskripsiChange(it) },
-            label = { Text(text = "Siaran Deskripsi") },
+            label = { Text(text = "Informasi Selengkapnya") },
             isError = deskripsiError,
             modifier = Modifier
                 .fillMaxWidth()
@@ -409,7 +497,7 @@ fun DetailBeritaAcaraCard(
         )
         if (deskripsiError) {
             Text(
-                text = "Siaran Deskripsi tidak boleh kosong",
+                text = "Informasi Selengkapnya tidak boleh kosong",
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -424,67 +512,6 @@ fun DetailBeritaAcaraCard(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun CalenderField(
-    jadwalIbadah: LocalDate,
-    onJadwalIbadahChange: (String) -> Unit
-) {
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-
-    val formattedDate by remember {
-        derivedStateOf {
-            DateTimeFormatter.ofPattern("MMM dd yyyy").format(pickedDate)
-        }
-    }
-
-    val dateDialogState = rememberMaterialDialogState()
-
-    LaunchedEffect(pickedDate) {
-        onJadwalIbadahChange(formattedDate)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = onJadwalIbadahChange,
-            readOnly = true,
-            label = { Text("Tanggal") },
-            trailingIcon = {
-                IconButton(onClick = { dateDialogState.show() }) {
-                    Icon(imageVector = Icons.Default.CalendarToday, contentDescription = "Pilih Tanggal")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Dialog untuk pemilih tanggal
-        MaterialDialog(
-            dialogState = dateDialogState,
-            buttons = {
-                positiveButton(text = "OK") {
-                    dateDialogState.hide()
-                }
-                negativeButton(text = "Batal") {
-                    dateDialogState.hide()
-                }
-            }
-        ) {
-            datepicker(
-                initialDate = pickedDate,
-                onDateChange = { pickedDate = it }
-            )
-        }
-    }
-}
-
 
 @Composable
 fun DeleteBeritaAcara(delete: () -> Unit) {

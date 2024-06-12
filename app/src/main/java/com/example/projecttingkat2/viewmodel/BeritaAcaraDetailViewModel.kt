@@ -36,19 +36,19 @@ class BeritaAcaraDetailViewModel(private val repository: BeritaAcaraRepository) 
         }
     }
 
-    fun insert(judul: String, namaGereja: String, pembicara: String, jadwalIbadah: String, deskripsi: String, gambarBerita: String) {
+    fun insert(judul: String, namaGereja: String, pembicara: String, jadwalIbadah: String, jamIbadah: String, deskripsi: String, gambarBerita: String) {
         viewModelScope.launch {
             val id = repository.getNextId()
-            val beritaAcara = BeritaAcara(id, judul, namaGereja, pembicara, jadwalIbadah, deskripsi, gambarBerita)
+            val beritaAcara = BeritaAcara(id, judul, namaGereja, pembicara, jadwalIbadah, jamIbadah, deskripsi, gambarBerita)
             repository.insert(beritaAcara)
             fetchBeritaAcaraList()
             Log.d("GerejaDetailViewModel", "Inserted berita acara with id: $id")
         }
     }
 
-    fun update(id: String, judul: String, namaGereja: String, pembicara: String, jadwalIbadah: String, deskripsi: String, gambarBerita: String) {
+    fun update(id: String, judul: String, namaGereja: String, pembicara: String, jadwalIbadah: String, jamIbadah: String, deskripsi: String, gambarBerita: String) {
         viewModelScope.launch {
-            val beritaAcara = BeritaAcara(id, judul, namaGereja, pembicara, jadwalIbadah, deskripsi, gambarBerita)
+            val beritaAcara = BeritaAcara(id, judul, namaGereja, pembicara, jadwalIbadah, jamIbadah, deskripsi, gambarBerita)
             repository.update(beritaAcara)
             fetchBeritaAcaraList()
             _editedBerita.value = beritaAcara

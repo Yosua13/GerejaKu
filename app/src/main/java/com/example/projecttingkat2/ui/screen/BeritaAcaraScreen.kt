@@ -11,11 +11,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.LockClock
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.PinDrop
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -29,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -237,20 +244,54 @@ fun BeritaAcaraCard(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
             )
-            Row(
+
+            Column(
                 modifier = Modifier
                     .padding(start = 16.dp, bottom = 8.dp)
             ) {
-                Column {
-                    Text(
-                        text = beritaAcara.judul,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold
+                Text(
+                    text = beritaAcara.judul,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.Mic,
+                        contentDescription = "Pembicara"
                     )
                     Text(
                         text = beritaAcara.pembicara,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 10.dp)
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.PinDrop,
+                        contentDescription = "Lokasi"
+                    )
+                    Text(
+                        text = beritaAcara.namaGereja,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.CalendarMonth,
+                        contentDescription = "Kalender"
+                    )
+                    Text(
+                        text = beritaAcara.jadwalIbadah,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Row (modifier = Modifier.padding(top = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.AccessTime,
+                        contentDescription = "Jam Ibadah"
+                    )
+                    Text(
+                        text = beritaAcara.jamIbadah,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }

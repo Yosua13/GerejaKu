@@ -6,6 +6,7 @@ data class BeritaAcara(
     var namaGereja: String = "",
     var pembicara: String = "",
     var jadwalIbadah: String = "",
+    var jamIbadah: String = "",
     var deskripsi: String = "",
     var gambarBerita: String = ""
 )

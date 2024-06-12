@@ -1,12 +1,16 @@
 package com.example.projecttingkat2.ui.screen.detail
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +31,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -78,12 +83,18 @@ import com.example.projecttingkat2.util.GerejaViewModelFactory
 import com.example.projecttingkat2.viewmodel.GerejaDetailViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.storage.storage
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.io.ByteArrayOutputStream
+import java.time.LocalDate
+import java.util.Calendar
 import java.util.UUID
 import kotlin.math.sin
 
 const val KEY_ID_GEREJA = "idGereja"
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailGerejaScreen(
@@ -228,6 +239,7 @@ fun DetailGerejaScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DetailGerejaCard(
     judul: String,
@@ -257,6 +269,27 @@ fun DetailGerejaCard(
     context: Context
 ) {
     val focusManager = LocalFocusManager.current
+
+    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val dateDialogState = rememberMaterialDialogState()
+
+    val year: Int
+    val month: Int
+    val day: Int
+
+    val calendar = Calendar.getInstance()
+    year = calendar.get(Calendar.YEAR)
+    month = calendar.get(Calendar.MONTH)
+    day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDayOfMonth: Int ->
+            val selectedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+            onJadwalChange(selectedDate)
+        }, year, month, day
+    )
 
     Column(
         modifier = Modifier
@@ -332,9 +365,15 @@ fun DetailGerejaCard(
         OutlinedTextField(
             value = jadwal,
             onValueChange = { onJadwalChange(it) },
-            label = { Text(text = "Jadwal Ibadah") },
+            readOnly = true,
             singleLine = true,
             isError = jadwalError,
+            label = { Text(text = "Jadwal Ibadah Gereja") },
+            trailingIcon = {
+                IconButton(onClick = { datePickerDialog.show() }) {
+                    Icon(imageVector = Icons.Default.CalendarToday, contentDescription = "Pilih Tanggal")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -343,6 +382,23 @@ fun DetailGerejaCard(
         )
         if (jadwalError) {
             Text(text = "Jadwal Ibadah tidak boleh kosong", color = MaterialTheme.colorScheme.error)
+        }
+        // Dialog untuk pemilih tanggal
+        MaterialDialog(
+            dialogState = dateDialogState,
+            buttons = {
+                positiveButton(text = "OK") {
+                    dateDialogState.hide()
+                }
+                negativeButton(text = "Batal") {
+                    dateDialogState.hide()
+                }
+            }
+        ) {
+            datepicker(
+                initialDate = pickedDate,
+                onDateChange = { pickedDate = it }
+            )
         }
 
         OutlinedTextField(

@@ -249,9 +249,9 @@ fun BookCard(
             AsyncImage(
                 model = imageRequest,
                 contentDescription = buku.judul,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
-                    .height(200.dp)
+                    .height(225.dp)
                     .clip(MaterialTheme.shapes.small)
                     .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
             )

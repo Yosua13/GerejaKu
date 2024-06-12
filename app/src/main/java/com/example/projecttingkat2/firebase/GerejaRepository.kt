@@ -49,7 +49,7 @@ class GerejaRepository {
         }
     }
 
-    suspend fun getNextId(): String {
+    fun getNextId(): String {
         val document = collection.document()
         return document.id
     }

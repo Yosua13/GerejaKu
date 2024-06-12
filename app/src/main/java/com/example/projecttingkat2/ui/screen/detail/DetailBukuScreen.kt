@@ -255,7 +255,7 @@ fun DetailBukuCard(
             value = sinopsis,
             onValueChange = { onSinopsisChange(it) },
             label = { Text(text = "Sinopsis Buku") },
-            singleLine = true,
+            singleLine = false,
             isError = sinopsisError,
             modifier = Modifier
                 .fillMaxWidth()
