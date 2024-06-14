@@ -31,10 +31,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.AvTimer
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
@@ -54,7 +52,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,7 +90,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.UUID
-import kotlin.math.sin
 
 const val KEY_ID_BERITA = "idBerita"
 
@@ -447,7 +443,7 @@ fun DetailBeritaAcaraCard(
             onValueChange = { onJamChange(it) },
             readOnly = true,
             singleLine = true,
-            isError = jadwalIbadahError,
+            isError = jamError,
             label = { Text("Jam Ibadah Gereja") },
             trailingIcon = {
                 IconButton(onClick = { timePickerDialog.show() }) {
